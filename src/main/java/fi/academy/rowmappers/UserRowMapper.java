@@ -13,6 +13,10 @@ public class UserRowMapper implements RowMapper<User> {
         User user = new User();
         user.setId(userRow.getInt("id"));
         user.setUsername(userRow.getString("username"));
+        user.setRole(userRow.getString("role"));
+        user.setPoints(userRow.getInt("points"));
+        user.setGroupId(userRow.getInt("groupId"));
+
         return user;
     }
 }

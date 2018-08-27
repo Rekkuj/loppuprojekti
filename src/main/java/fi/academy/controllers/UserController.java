@@ -30,7 +30,10 @@ public class UserController {
             (ResultSet rs, int index) -> {
                 return new User(
                         rs.getInt("id"),
-                        rs.getString("username"));
+                        rs.getString("username"),
+                        rs.getString("role"),
+                        rs.getInt("points"),
+                        rs.getInt("groupId"));
                 
             });
         return result;
@@ -47,7 +50,7 @@ public class UserController {
     @PostMapping()
     public String insertUser(@RequestBody User user){
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username) values (?)";
+        String sql = "INSERT INTO users (username, role, points, groupId) values (?, ?, ?, ?)";
     
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
