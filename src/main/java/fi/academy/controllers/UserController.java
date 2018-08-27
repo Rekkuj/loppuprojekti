@@ -3,15 +3,22 @@ package fi.academy.controllers;
 import fi.academy.entities.User;
 import fi.academy.exceptions.UserNotFoundException;
 import fi.academy.repositories.UserRepository;
+import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 @RestController
@@ -35,5 +42,40 @@ public class UserController {
         return result;
     }
     
-
+    @GetMapping("/{id}")
+    public User getOneUser(@PathVariable int id){
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String sql = "SELECT * FROM users WHERE id=?";
+        User oneUser = jdbc.queryForObject(sql, userRowMapper, id);
+        return oneUser;
+    }
+    
+    @PostMapping()
+    public int insertUser(@RequestBody User user){
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "INSERT INTO users (username) values (?)";
+    
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, user.getUsername());
+            return preparedStatement;
+        };
+        
+        jdbc.update(preparedStatementCreator, kh);
+        int id = kh.getKey().intValue();
+        return id;
+    }
+    
+    @PutMapping("/{id}")
+    public int updateUser(@PathVariable int id, @RequestBody User user) {
+        String sql = "UPDATE users SET username = ? WHERE id=?";
+        return jdbc.update(sql, new Object[] {user.getUsername(), id});
+    }
+    
+    @DeleteMapping("/{id}")
+    public int deleteUserById(@PathVariable int id) {
+        String sql = "DELETE FROM users WHERE id=?";
+        return jdbc.update(sql, new Object[] {id});
+    }
 }
