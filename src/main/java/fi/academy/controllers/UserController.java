@@ -35,41 +35,5 @@ public class UserController {
         return result;
     }
     
-//    @GetMapping("/{id}")
-//    public User getByUsername(@PathVariable(name="id") int id) {
-//        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Hakemaasi käyttäjää ei löydy"));
-//    }
-//
-//    @GetMapping("/{username}")
-//    public User getByUserName(@PathVariable(name="username") String username) {
-//        return userRepository.findByUsername(username);
-//    }
-//
-//    @PostMapping
-//    public ResponseEntity<?> addOneUser(@RequestBody User user){
-//        userRepository.save(user);
-//        int id = user.getId();
-//        URI location = UriComponentsBuilder.newInstance()
-//                .scheme("http")
-//                .host("localhost")
-//                .port(8080)
-//                .path("/users/{id}")
-//                .buildAndExpand(id)
-//                .toUri();
-//        return ResponseEntity.created(location).build();
-//    }
-//
-//    @PutMapping("/{id}")
-//    public void editOneUser(@RequestBody User editedUser, @PathVariable int id) {
-//        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("'Päivitys ei onnistu. Käyttäjää ei löydy"));
-//        editedUser.setId(user.getId());
-//        userRepository.save(editedUser);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteOne(@PathVariable int id) {
-//        userRepository.deleteById(id);
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//
-//    }
+
 }
