@@ -9,10 +9,12 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.*;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -44,7 +46,7 @@ public class UserController {
     }
     
     @PostMapping()
-    public int insertUser(@RequestBody User user){
+    public String insertUser(@RequestBody User user){
         KeyHolder kh = new GeneratedKeyHolder();
         String sql = "INSERT INTO users (username) values (?)";
     
@@ -56,8 +58,7 @@ public class UserController {
         };
         
         jdbc.update(preparedStatementCreator, kh);
-        int id = kh.getKey().intValue();
-        return id;
+        return kh.getKeys().toString();
     }
     
     @PutMapping("/{id}")

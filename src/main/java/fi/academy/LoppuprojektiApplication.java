@@ -18,16 +18,16 @@ public class LoppuprojektiApplication {
         SpringApplication.run(LoppuprojektiApplication.class, args);
     }
     
-    @Bean
-    CommandLineRunner alkuun(@Autowired JdbcTemplate jdbcTemplate) {
-        return args -> {
-            List<User> result = jdbcTemplate.query("select * from users",
-                    (ResultSet rs, int index)->{
-                        return new User(
-                                rs.getInt("id"),
-                                rs.getString("username"));
-                    });
-            System.out.println(result);
-        };
-    }
+//    @Bean
+//    CommandLineRunner alkuun(@Autowired JdbcTemplate jdbcTemplate) {
+//        return args -> {
+//            List<User> result = jdbcTemplate.query("select * from users",
+//                    (ResultSet rs, int index)->{
+//                        return new User(
+//                                rs.getInt("id"),
+//                                rs.getString("username"));
+//                    });
+//            System.out.println(result);
+//        };
+//    }
 }
