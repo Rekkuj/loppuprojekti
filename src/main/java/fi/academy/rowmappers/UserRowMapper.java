@@ -16,7 +16,7 @@ public class UserRowMapper implements RowMapper<User> {
         user.setRole(userRow.getString("role"));
         user.setPoints(userRow.getInt("points"));
         user.setGroupId(userRow.getInt("groupId"));
-
+//        user.setCompletedTask(userRow.getString("completedtask"));
         return user;
     }
 }

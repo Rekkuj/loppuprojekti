@@ -27,7 +27,15 @@ public class User {
         this.groupId = groupId;
         this.completedTask = completedTask;
     }
-
+    
+    public User(int id, String username, String role, int points, int groupId) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+        this.points = points;
+        this.groupId = groupId;
+    }
+    
     public Integer getId() {
         return id;
     }

@@ -33,20 +33,19 @@ public class UserController {
                             rs.getString("username"),
                             rs.getString("role"),
                             rs.getInt("points"),
-                            rs.getInt("groupId"),
-                            rs.getString("completedtasks"));
+                            rs.getInt("groupId"));
                 });
         return result;
     }
     
     @GetMapping("/{id}")
-    public User getOneUserById(@PathVariable int id) {
+    public User getOneUserById(@PathVariable Integer id) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE id=?";
         return jdbc.queryForObject(sql, userRowMapper, id);
     }
     
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public User getOneUserByUsername(@PathVariable String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE username=?";
