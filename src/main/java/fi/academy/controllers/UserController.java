@@ -56,7 +56,7 @@ public class UserController {
     @PostMapping()
     public String insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points, groupId, completedtasks) values (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, role, points) values (?,  ?, ?)";
         
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
@@ -64,8 +64,7 @@ public class UserController {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getRole());
             preparedStatement.setInt(3, user.getPoints());
-            preparedStatement.setInt(4, user.getGroupId());
-            preparedStatement.setString(5, user.getCompletedTask());
+//            preparedStatement.setInt(4, user.getGroupId());
             return preparedStatement;
         };
         
@@ -74,9 +73,15 @@ public class UserController {
     }
     
     @PutMapping("/{id}")
-    public int updateUser(@PathVariable int id, @RequestBody User user) {
+    public int updateUsername(@PathVariable int id, @RequestBody User user) {
         String sql = "UPDATE users SET username = ? WHERE id=?";
         return jdbc.update(sql, new Object[]{user.getUsername(), id});
+    }
+    
+    @PutMapping("/user/{id}")
+    public int updateUsersGroup(@PathVariable int id, @RequestBody User user) {
+        String sql = "UPDATE users SET groupid = ? WHERE id=?";
+        return jdbc.update(sql, new Object[]{user.getGroupId(), id});
     }
     
     @DeleteMapping("/{id}")
