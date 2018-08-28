@@ -2,7 +2,6 @@ package fi.academy.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -15,17 +14,18 @@ public class User {
     private String role;
     private Integer points;
     private Integer groupId;
-
+    private String completedTask;
     
     public User() {
     }
 
-    public User(Integer id, String username, String role, Integer points, Integer groupId) {
+    public User(Integer id, String username, String role, Integer points, Integer groupId, String completedTask) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupId = groupId;
+        this.completedTask = completedTask;
     }
 
     public Integer getId() {
@@ -67,5 +67,14 @@ public class User {
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;
     }
+    
+    public String getCompletedTask() {
+        return completedTask;
+    }
+    
+    public void setCompletedTask(String completedTask) {
+        this.completedTask = completedTask;
+    }
+    
+    
 }
-

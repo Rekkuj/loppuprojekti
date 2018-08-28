@@ -27,35 +27,45 @@ public class UserController {
     @GetMapping()
     public List<User> users() {
         List<User> result = jdbc.query("select * from users",
-            (ResultSet rs, int index) -> {
-                return new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("role"),
-                        rs.getInt("points"),
-                        rs.getInt("groupId"));
-                
-            });
+                (ResultSet rs, int index) -> {
+                    return new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("role"),
+                            rs.getInt("points"),
+                            rs.getInt("groupId"),
+                            rs.getString("completedtasks"));
+                });
         return result;
     }
     
     @GetMapping("/{id}")
-    public User getOneUser(@PathVariable int id){
+    public User getOneUserById(@PathVariable int id) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE id=?";
-        User oneUser = jdbc.queryForObject(sql, userRowMapper, id);
-        return oneUser;
+        return jdbc.queryForObject(sql, userRowMapper, id);
+    }
+    
+    @GetMapping("/{username}")
+    public User getOneUserByUsername(@PathVariable String username) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String sql = "SELECT * FROM users WHERE username=?";
+        return jdbc.queryForObject(sql, userRowMapper, username);
     }
     
     @PostMapping()
-    public String insertUser(@RequestBody User user){
+    public String insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points, groupId) values (?, ?, ?, ?)";
-    
+        String sql = "INSERT INTO users (username, role, points, groupId, completedtasks) values (?, ?, ?, ?, ?)";
+        
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getRole());
+            preparedStatement.setInt(3, user.getPoints());
+            preparedStatement.setInt(4, user.getGroupId());
+            preparedStatement.setString(5, user.getCompletedTask());
             return preparedStatement;
         };
         
@@ -66,12 +76,12 @@ public class UserController {
     @PutMapping("/{id}")
     public int updateUser(@PathVariable int id, @RequestBody User user) {
         String sql = "UPDATE users SET username = ? WHERE id=?";
-        return jdbc.update(sql, new Object[] {user.getUsername(), id});
+        return jdbc.update(sql, new Object[]{user.getUsername(), id});
     }
     
     @DeleteMapping("/{id}")
     public int deleteUserById(@PathVariable int id) {
         String sql = "DELETE FROM users WHERE id=?";
-        return jdbc.update(sql, new Object[] {id});
+        return jdbc.update(sql, new Object[]{id});
     }
 }
