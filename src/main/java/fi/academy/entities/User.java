@@ -14,18 +14,19 @@ public class User {
     private String role;
     private Integer points;
     private Integer groupId;
-    private String completedTask;
+    private String[] completedtasks;
+    private Integer contactpersonuserid;
     
     public User() {
     }
 
-    public User(Integer id, String username, String role, Integer points, Integer groupId, String completedTask) {
+    public User(Integer id, String username, String role, Integer points, Integer groupId, String[] completedtasks) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupId = groupId;
-        this.completedTask = completedTask;
+        this.completedtasks = completedtasks;
     }
     
     public User(int id, String username, String role, int points, int groupId) {
@@ -76,13 +77,19 @@ public class User {
         this.groupId = groupId;
     }
     
-    public String getCompletedTask() {
-        return completedTask;
+    public String[] getCompletedtasks() {
+        return completedtasks;
     }
     
-    public void setCompletedTask(String completedTask) {
-        this.completedTask = completedTask;
+    public void setCompletedtasks(String[] completedtask) {
+        this.completedtasks = completedtask;
     }
     
+    public Integer getContactpersonuserid() {
+        return contactpersonuserid;
+    }
     
+    public void setContactpersonuserid(Integer contactpersonuserid) {
+        this.contactpersonuserid = contactpersonuserid;
+    }
 }

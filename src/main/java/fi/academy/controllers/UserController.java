@@ -83,6 +83,23 @@ public class UserController {
         return jdbc.update(sql, new Object[]{user.getPoints(), id});
     }
     
+    @PutMapping("/{id}/completed")
+    public String updateUserCompletedtasks(@PathVariable Integer id, @RequestBody User user) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE users SET completedtasks = ? WHERE id=?";
+    
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("text", user.getCompletedtasks()));
+            preparedStatement.setInt(2, id);
+            return preparedStatement;
+        };
+    
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
+    }
+    
     @PutMapping("/disableuser/{id}")
     public int deleteUserById(@PathVariable Integer id) {
         String sql = "DELETE FROM users WHERE id=?";
