@@ -55,7 +55,7 @@ public class UserController {
     @PostMapping()
     public String insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points) values (?,  ?, ?)";
+        String sql = "INSERT INTO users (username, role, points, groupid) values (?, ?, ?, ?)";
         
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
@@ -63,7 +63,7 @@ public class UserController {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getRole());
             preparedStatement.setInt(3, user.getPoints());
-//            preparedStatement.setInt(4, user.getGroupId());
+            preparedStatement.setInt(4, user.getGroupId());
             return preparedStatement;
         };
         
@@ -72,19 +72,19 @@ public class UserController {
     }
     
     @PutMapping("/{id}")
-    public int updateUsername(@PathVariable int id, @RequestBody User user) {
+    public int updateUsername(@PathVariable Integer id, @RequestBody User user) {
         String sql = "UPDATE users SET username = ? WHERE id=?";
         return jdbc.update(sql, new Object[]{user.getUsername(), id});
     }
     
     @PutMapping("/user/{id}")
-    public int updateUsersGroup(@PathVariable int id, @RequestBody User user) {
-        String sql = "UPDATE users SET groupid = ? WHERE id=?";
-        return jdbc.update(sql, new Object[]{user.getGroupId(), id});
+    public int updateUserPoints(@PathVariable Integer id, @RequestBody User user) {
+        String sql = "UPDATE users SET points = ? WHERE id=?";
+        return jdbc.update(sql, new Object[]{user.getPoints(), id});
     }
     
-    @DeleteMapping("/{id}")
-    public int deleteUserById(@PathVariable int id) {
+    @PutMapping("/disableuser/{id}")
+    public int deleteUserById(@PathVariable Integer id) {
         String sql = "DELETE FROM users WHERE id=?";
         return jdbc.update(sql, new Object[]{id});
     }
