@@ -33,7 +33,9 @@ public class UserController {
                             rs.getString("username"),
                             rs.getString("role"),
                             rs.getInt("points"),
-                            rs.getInt("groupId"));
+                            rs.getInt("groupId"),
+//                            (String[])rs.getArray("completedtasks").getArray(),
+                            rs.getInt("contactpersonuserid"));
                 });
         return result;
     }
@@ -51,19 +53,28 @@ public class UserController {
         String sql = "SELECT * FROM users WHERE username=?";
         return jdbc.queryForObject(sql, userRowMapper, username);
     }
+
+    @GetMapping("/{id}/completedtasks")
+    public User getCompletedTasksForUser(@PathVariable int id){
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String sql = "SELECT completedtasks FROM users WHERE id=?";
+        return jdbc.queryForObject(sql, userRowMapper, id);
+    }
     
     @PostMapping()
     public String insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points, groupid) values (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid) values (?, ?, ?, ?, ?, ?)";
         
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getRole());
-            preparedStatement.setInt(3, user.getPoints());
+            preparedStatement.setInt(3, 0);
             preparedStatement.setInt(4, user.getGroupId());
+            preparedStatement.setArray(5, connection.createArrayOf("text", user.getCompletedtasks()));
+            preparedStatement.setInt(6, user.getContactpersonuserid());
             return preparedStatement;
         };
         
@@ -87,7 +98,7 @@ public class UserController {
     public String updateUserCompletedtasks(@PathVariable Integer id, @RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
         String sql = "UPDATE users SET completedtasks = ? WHERE id=?";
-    
+        
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -95,7 +106,7 @@ public class UserController {
             preparedStatement.setInt(2, id);
             return preparedStatement;
         };
-    
+        
         jdbc.update(preparedStatementCreator, kh);
         return kh.getKeys().toString();
     }

@@ -37,6 +37,25 @@ public class User {
         this.groupId = groupId;
     }
     
+    public User(int id, String username, String role, int points, int groupId, String[] completedtasks, int contactpersonuserid) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+        this.points = points;
+        this.groupId = groupId;
+        this.completedtasks = completedtasks;
+        this.contactpersonuserid = contactpersonuserid;
+    }
+    
+    public User(int id, String username, String role, int points, int groupId, int contactpersonuserid) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+        this.points = points;
+        this.groupId = groupId;
+        this.contactpersonuserid = contactpersonuserid;
+    }
+    
     public Integer getId() {
         return id;
     }
