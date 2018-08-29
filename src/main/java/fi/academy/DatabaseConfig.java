@@ -1,5 +1,4 @@
 package fi.academy;
-// Author: Reija Jokinen
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;

@@ -1,5 +1,4 @@
 package fi.academy.entities;
-// Author: Reija Jokinen
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -1,5 +1,4 @@
 package fi.academy.controllers;
-// Author: Reija Jokinen & Miika Huhtanen
 
 import fi.academy.entities.User;
 import fi.academy.rowmappers.OneStringRowMapper;
