@@ -1,4 +1,5 @@
 package fi.academy.controllers;
+// Author: Reija Jokinen & Miika Huhtanen
 
 import fi.academy.entities.Group;
 import fi.academy.rowmappers.GroupRowMapper;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -29,11 +32,23 @@ public class GroupController {
     public List<Group> groups() {
         List<Group> result = jdbc.query("select * from groups",
                 (ResultSet rs, int index) -> {
+                String[] ifTeachersNull;
+                if (rs.getArray("teachers")==null){
+                    ifTeachersNull = new String[0];
+                } else {
+                    ifTeachersNull = (String[])rs.getArray("teachers").getArray();
+                }
+                String[] ifPupilsNull;
+                if (rs.getArray("pupils")==null) {
+                    ifPupilsNull = new String[0];
+                } else {
+                    ifPupilsNull =(String[])rs.getArray("pupils").getArray();
+                }
                     return new Group(
                             rs.getInt("groupid"),
                             rs.getString("groupname"),
-                            (String[])rs.getArray("teachers").getArray(),
-                            (String[])rs.getArray("pupils").getArray(),
+                            ifTeachersNull,
+                            ifPupilsNull,
                             rs.getInt("taskscores"));
                 });
         return result;
@@ -60,7 +75,7 @@ public class GroupController {
         return jdbc.queryForObject(sql, pupilsRowMapper, groupid);
     }
     
-    @GetMapping("/groupname/{groupname}")
+    @GetMapping("/{groupname}/groupname")
     public Group getOneGroupByGroupname(@PathVariable String groupname) {
         RowMapper<Group> groupRowMapper = new GroupRowMapper();
         String sql = "SELECT * FROM groups WHERE groupname=?";
@@ -86,10 +101,64 @@ public class GroupController {
         return kh.getKeys().toString();
     }
     
-    @PutMapping("/{groupid}")
-    public int updateGroupname(@PathVariable Integer groupid, @RequestBody Group group) {
-        String sql = "UPDATE groups SET groupname = ? WHERE groupid=?";
-        return jdbc.update(sql, new Object[]{group.getGroupname(), groupid});
+    @PutMapping("/{groupid}/teachers")
+    public String updateGroupTeachers(@PathVariable Integer groupid, @RequestBody Group group) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
+    
+    
+        ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid)));
+        for (String teacher: group.getTeachers()) {
+            existingTeachers.add(teacher);
+        }
+    
+        String[] updatedTeachers = new String[existingTeachers.size()];
+        updatedTeachers = existingTeachers.toArray(updatedTeachers);
+    
+        String[] finalUpdatedTeachers = updatedTeachers;
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTeachers));
+            preparedStatement.setInt(2, groupid);
+            return preparedStatement;
+        };
+    
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
+    }
+    
+    @PutMapping("/{groupid}/pupils")
+    public String updateGroupPupils(@PathVariable Integer groupid, @RequestBody Group group) {
+    KeyHolder kh = new GeneratedKeyHolder();
+    String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
+    
+    
+    ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid)));
+        for (String pupil: group.getPupils()) {
+        existingPupils.add(pupil);
+    }
+    
+    String[] updatedPupils = new String[existingPupils.size()];
+    updatedPupils = existingPupils.toArray(updatedPupils);
+    
+    String[] finalUpdatedPupils = updatedPupils;
+    PreparedStatementCreator preparedStatementCreator = connection -> {
+        PreparedStatement preparedStatement = connection
+                .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedPupils));
+        preparedStatement.setInt(2, groupid);
+        return preparedStatement;
+    };
+    
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
+    }
+    
+    @PutMapping("/{groupid}/scores")
+    public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
+        String sql = "UPDATE groups SET taskscores = ? WHERE groupid=?";
+        return jdbc.update(sql, new Object[]{group.getTaskscores(), groupid});
     }
     
 }

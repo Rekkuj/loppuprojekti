@@ -1,4 +1,5 @@
 package fi.academy.controllers;
+// Author: Reija Jokinen & Miika Huhtanen
 
 import fi.academy.entities.User;
 import fi.academy.rowmappers.OneStringRowMapper;
@@ -31,26 +32,32 @@ public class UserController {
     public List<User> users() {
         List<User> result = jdbc.query("select * from users",
                 (ResultSet rs, int index) -> {
+                String[] ifCompletedtaskNull;
+                if (rs.getArray("completedtasks")==null) {
+                    ifCompletedtaskNull = new String[0];
+                } else {
+                    ifCompletedtaskNull = (String[])rs.getArray("completedtasks").getArray();
+                }
                     return new User(
                             rs.getInt("id"),
                             rs.getString("username"),
                             rs.getString("role"),
                             rs.getInt("points"),
                             rs.getInt("groupId"),
-//                            (String[])rs.getArray("completedtasks").getArray(),
+                            ifCompletedtaskNull,
                             rs.getInt("contactpersonuserid"));
                 });
         return result;
     }
     
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/id")
     public User getOneUserById(@PathVariable Integer id) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE id=?";
         return jdbc.queryForObject(sql, userRowMapper, id);
     }
     
-    @GetMapping("/username/{username}")
+    @GetMapping("/{username}/username")
     public User getOneUserByUsername(@PathVariable String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE username=?";
@@ -85,29 +92,41 @@ public class UserController {
         return kh.getKeys().toString();
     }
     
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/username")
     public int updateUsername(@PathVariable Integer id, @RequestBody User user) {
         String sql = "UPDATE users SET username = ? WHERE id=?";
         return jdbc.update(sql, new Object[]{user.getUsername(), id});
     }
     
-    @PutMapping("/user/{id}")
+    @PutMapping("/{id}/role")
+    public int updateUserRole(@PathVariable Integer id, @RequestBody User user) {
+        String sql = "UPDATE users SET role = ? WHERE id=?";
+        return jdbc.update(sql, new Object[]{user.getRole(), id});
+    }
+    
+    @PutMapping("/id}/points")
     public int updateUserPoints(@PathVariable Integer id, @RequestBody User user) {
         String sql = "UPDATE users SET points = ? WHERE id=?";
         return jdbc.update(sql, new Object[]{user.getPoints(), id});
+    }
+    
+    @PutMapping("/id}/groupid")
+    public int updateUserGroupid(@PathVariable Integer id, @RequestBody User user) {
+        String sql = "UPDATE users SET groupid = ? WHERE id=?";
+        return jdbc.update(sql, new Object[]{user.getGroupId(), id});
     }
     
     @PutMapping("/{id}/completed")
     public String updateUserCompletedtasks(@PathVariable Integer id, @RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
         String sql = "UPDATE users SET completedtasks = ? WHERE id=?";
-        ArrayList<String> oldCompletedTasks = new ArrayList<>(Arrays.asList(getCompletedTasksForUser(id)));
+        ArrayList<String> existingCompletedTasks = new ArrayList<>(Arrays.asList(getCompletedTasksForUser(id)));
         for (String task : user.getCompletedtasks()) {
-            oldCompletedTasks.add(task);
+            existingCompletedTasks.add(task);
         }
         
-        String[] updatedTasks = new String[oldCompletedTasks.size()];
-        updatedTasks = oldCompletedTasks.toArray(updatedTasks);
+        String[] updatedTasks = new String[existingCompletedTasks.size()];
+        updatedTasks = existingCompletedTasks.toArray(updatedTasks);
     
         String[] finalUpdatedTasks = updatedTasks;
         PreparedStatementCreator preparedStatementCreator = connection -> {
@@ -122,9 +141,10 @@ public class UserController {
         return kh.getKeys().toString();
     }
     
-    @PutMapping("/disableuser/{id}")
-    public int deleteUserById(@PathVariable Integer id) {
-        String sql = "DELETE FROM users WHERE id=?";
-        return jdbc.update(sql, new Object[]{id});
+    @PutMapping("/id}/contact")
+    public int updateUserContactpersonuserid(@PathVariable Integer id, @RequestBody User user) {
+        String sql = "UPDATE users SET contactpersonuserid = ? WHERE id=?";
+        return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
     }
+
 }

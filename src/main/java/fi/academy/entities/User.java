@@ -1,4 +1,5 @@
 package fi.academy.entities;
+// Author: Reija Jokinen
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +27,7 @@ public class User {
         this.role = role;
         this.points = points;
         this.groupId = groupId;
-        this.completedtasks = completedtasks;
+        this.completedtasks = completedtasks!=null ? completedtasks : new String[0];
     }
     
     public User(int id, String username, String role, int points, int groupId) {
@@ -43,7 +44,7 @@ public class User {
         this.role = role;
         this.points = points;
         this.groupId = groupId;
-        this.completedtasks = completedtasks;
+        this.completedtasks = completedtasks==null ? new String[0] : completedtasks;
         this.contactpersonuserid = contactpersonuserid;
     }
     

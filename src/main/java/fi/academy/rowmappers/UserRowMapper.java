@@ -1,4 +1,5 @@
 package fi.academy.rowmappers;
+// Author: Reija Jokinen
 
 import fi.academy.entities.User;
 import org.springframework.jdbc.core.RowMapper;
