@@ -1,6 +1,7 @@
 package fi.academy.controllers;
 
 import fi.academy.entities.User;
+import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -53,12 +56,12 @@ public class UserController {
         String sql = "SELECT * FROM users WHERE username=?";
         return jdbc.queryForObject(sql, userRowMapper, username);
     }
-
+    
     @GetMapping("/{id}/completedtasks")
-    public User getCompletedTasksForUser(@PathVariable int id){
-        RowMapper<User> userRowMapper = new UserRowMapper();
+    public String[] getCompletedTasksForUser(@PathVariable Integer id) {
+        RowMapper<String[]> completedTasksRowMapper = new OneStringRowMapper("completedtasks");
         String sql = "SELECT completedtasks FROM users WHERE id=?";
-        return jdbc.queryForObject(sql, userRowMapper, id);
+        return jdbc.queryForObject(sql, completedTasksRowMapper, id);
     }
     
     @PostMapping()
@@ -98,11 +101,19 @@ public class UserController {
     public String updateUserCompletedtasks(@PathVariable Integer id, @RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
         String sql = "UPDATE users SET completedtasks = ? WHERE id=?";
+        ArrayList<String> oldCompletedTasks = new ArrayList<>(Arrays.asList(getCompletedTasksForUser(id)));
+        for (String task : user.getCompletedtasks()) {
+            oldCompletedTasks.add(task);
+        }
         
+        String[] updatedTasks = new String[oldCompletedTasks.size()];
+        updatedTasks = oldCompletedTasks.toArray(updatedTasks);
+    
+        String[] finalUpdatedTasks = updatedTasks;
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setArray(1, connection.createArrayOf("text", user.getCompletedtasks()));
+            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTasks));
             preparedStatement.setInt(2, id);
             return preparedStatement;
         };

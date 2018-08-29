@@ -2,6 +2,7 @@ package fi.academy.controllers;
 
 import fi.academy.entities.Group;
 import fi.academy.rowmappers.GroupRowMapper;
+import fi.academy.rowmappers.OneStringRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -45,6 +46,20 @@ public class GroupController {
         return jdbc.queryForObject(sql, groupRowMapper, groupid);
     }
 
+    @GetMapping("/{groupid}/teachers")
+    public String[] getTeachersByGroupId(@PathVariable Integer groupid) {
+        RowMapper<String[]> teachersRowMapper = new OneStringRowMapper("teachers");
+        String sql = "SELECT teachers FROM groups WHERE groupid=?";
+        return jdbc.queryForObject(sql, teachersRowMapper, groupid);
+    }
+    
+    @GetMapping("/{groupid}/pupils")
+    public String[] getPupilsByGroupId(@PathVariable Integer groupid) {
+        RowMapper<String[]> pupilsRowMapper = new OneStringRowMapper("pupils");
+        String sql = "SELECT pupils FROM groups WHERE groupid=?";
+        return jdbc.queryForObject(sql, pupilsRowMapper, groupid);
+    }
+    
     @GetMapping("/groupname/{groupname}")
     public Group getOneGroupByGroupname(@PathVariable String groupname) {
         RowMapper<Group> groupRowMapper = new GroupRowMapper();
