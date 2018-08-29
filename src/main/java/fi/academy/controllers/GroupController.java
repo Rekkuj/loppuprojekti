@@ -127,11 +127,40 @@ public class GroupController {
         return kh.getKeys().toString();
     }
     
+    @PutMapping("/{groupid}/teachertodelete")
+    public String deleteOneTeacherFromGroupTeachers(@PathVariable Integer groupid, @RequestBody String teacherToDelete) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
+        
+        ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid)));
+
+        for (String teacher: existingTeachers) {
+            if (teacher.equals(teacherToDelete)){
+                existingTeachers.remove(teacher);
+                break;
+            }
+        }
+    
+        String[] updatedTeachers = new String[existingTeachers.size()];
+        updatedTeachers = existingTeachers.toArray(updatedTeachers);
+    
+        String[] finalUpdatedTeachers = updatedTeachers;
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTeachers));
+            preparedStatement.setInt(2, groupid);
+            return preparedStatement;
+        };
+        
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
+    }
+    
     @PutMapping("/{groupid}/pupils")
     public String updateGroupPupils(@PathVariable Integer groupid, @RequestBody Group group) {
     KeyHolder kh = new GeneratedKeyHolder();
     String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
-    
     
     ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid)));
         for (String pupil: group.getPupils()) {
@@ -154,10 +183,39 @@ public class GroupController {
         return kh.getKeys().toString();
     }
     
+    @PutMapping("/{groupid}/pupiltodelete")
+    public String deleteOnePupilFromGroupPupils(@PathVariable Integer groupid, @RequestBody String pupilToDelete) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
+        
+        ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid)));
+        System.out.println(pupilToDelete);
+        for (String pupil: existingPupils) {
+            if (pupil.equals(pupilToDelete)){
+                existingPupils.remove(pupil);
+                break;
+            }
+        }
+        
+        String[] updatedPupils = new String[existingPupils.size()];
+        updatedPupils = existingPupils.toArray(updatedPupils);
+        
+        String[] finalUpdatedPupils = updatedPupils;
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedPupils));
+            preparedStatement.setInt(2, groupid);
+            return preparedStatement;
+        };
+        
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
+    }
+    
     @PutMapping("/{groupid}/scores")
     public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
         String sql = "UPDATE groups SET taskscores = ? WHERE groupid=?";
         return jdbc.update(sql, new Object[]{group.getTaskscores(), groupid});
     }
-    
 }
