@@ -47,8 +47,7 @@ public class User {
         this.contactpersonuserid = contactpersonuserid;
     }
     
-    public User(int id, String username, String role, int points, int groupId, int contactpersonuserid) {
-        this.id = id;
+    public User(String username, String role, int points, int groupId, int contactpersonuserid) {
         this.username = username;
         this.role = role;
         this.points = points;

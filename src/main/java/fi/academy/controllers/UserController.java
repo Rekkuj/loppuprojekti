@@ -1,9 +1,12 @@
 package fi.academy.controllers;
 
 import fi.academy.entities.User;
+import fi.academy.exceptions.UserNotFoundException;
 import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +32,7 @@ public class UserController {
     }
     
     @GetMapping()
-    public List<User> users() {
+    public List<User> getAllUsers() {
         List<User> result = jdbc.query("select * from users",
                 (ResultSet rs, int index) -> {
                 String[] ifCompletedtaskNull;
@@ -59,8 +63,8 @@ public class UserController {
     @GetMapping("/{username}/username")
     public User getOneUserByUsername(@PathVariable String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
-        String sql = "SELECT * FROM users WHERE username=?";
-        return jdbc.queryForObject(sql, userRowMapper, username);
+            String sql = "SELECT * FROM users WHERE username=?";
+            return jdbc.queryForObject(sql, userRowMapper, username);
     }
     
     @GetMapping("/{id}/completedtasks")

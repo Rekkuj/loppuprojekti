@@ -28,7 +28,7 @@ public class GroupController {
     }
     
     @GetMapping()
-    public List<Group> groups() {
+    public List<Group> getAllGroups() {
         List<Group> result = jdbc.query("select * from groups",
                 (ResultSet rs, int index) -> {
                 String[] ifTeachersNull;
