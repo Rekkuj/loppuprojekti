@@ -56,7 +56,7 @@ public class GroupController {
     @GetMapping("/{groupid}")
     public Group getOneUserById(@PathVariable Integer groupid) {
         RowMapper<Group> groupRowMapper = new GroupRowMapper();
-        String sql = "SELECT * FROM groups WHERE id=?";
+        String sql = "SELECT * FROM groups WHERE groupid=?";
         return jdbc.queryForObject(sql, groupRowMapper, groupid);
     }
 
@@ -189,7 +189,6 @@ public class GroupController {
         String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
         
         ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid)));
-        System.out.println(pupilToDelete);
         for (String pupil: existingPupils) {
             if (pupil.equals(pupilToDelete)){
                 existingPupils.remove(pupil);
