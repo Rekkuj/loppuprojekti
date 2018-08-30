@@ -105,7 +105,6 @@ public class GroupController {
         KeyHolder kh = new GeneratedKeyHolder();
         String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
     
-    
         ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid)));
         for (String teacher: group.getTeachers()) {
             existingTeachers.add(teacher);
