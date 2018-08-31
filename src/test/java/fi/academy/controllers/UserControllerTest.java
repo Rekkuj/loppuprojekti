@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LoppuprojektiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class UserControllerIT {
+public class UserControllerTest {
     
     @LocalServerPort
     private int port;
@@ -63,7 +63,7 @@ public class UserControllerIT {
     @Test
     public void getCompletedTasksForUserTest() throws JSONException {
         response = this.restTemplate.getForObject("/users/1/completedtasks", String.class);
-        JSONAssert.assertEquals("{[]}", response, false);
+        JSONAssert.assertEquals("[\"Himmeli\", \"Helpperi\"]", response, false);
     }
     
 }
