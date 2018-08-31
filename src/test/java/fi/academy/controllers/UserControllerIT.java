@@ -1,8 +1,6 @@
 package fi.academy.controllers;
 
 import fi.academy.LoppuprojektiApplication;
-import fi.academy.entities.Group;
-import fi.academy.entities.User;
 import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,4 +46,24 @@ public class UserControllerIT {
     private String urlWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
+    
+    @Test
+    public void getOneUserByUsernameTest() throws JSONException {
+        response = this.restTemplate.getForObject("/users/Rekku/username", String.class);
+        JSONAssert.assertEquals("{\n" +
+                "    \"username\": \"Rekku\",\n" +
+                "    \"role\": \"Testaaja\",\n" +
+                "    \"points\": 2000,\n" +
+                "    \"groupid\": 2,\n" +
+                "    \"completedtasks\": [\"Orvokki\", \"Ruiskaunokki\"],\n" +
+                "    \"contactpersonuserid\": 1\n" +
+                "}", response, false);
+    }
+
+    @Test
+    public void getCompletedTasksForUserTest() throws JSONException {
+        response = this.restTemplate.getForObject("/users/1/completedtasks", String.class);
+        JSONAssert.assertEquals("{[]}", response, false);
+    }
+    
 }

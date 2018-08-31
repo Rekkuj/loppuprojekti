@@ -1,12 +1,9 @@
 package fi.academy.controllers;
 
 import fi.academy.entities.User;
-import fi.academy.exceptions.UserNotFoundException;
 import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +42,7 @@ public class UserController {
                             rs.getString("username"),
                             rs.getString("role"),
                             rs.getInt("points"),
-                            rs.getInt("groupId"),
+                            rs.getInt("groupid"),
                             ifCompletedtaskNull,
                             rs.getInt("contactpersonuserid"));
                 });
@@ -85,7 +81,7 @@ public class UserController {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getRole());
             preparedStatement.setInt(3, 0);
-            preparedStatement.setInt(4, user.getGroupId());
+            preparedStatement.setInt(4, user.getGroupid());
             preparedStatement.setArray(5, connection.createArrayOf("text", user.getCompletedtasks()));
             preparedStatement.setInt(6, user.getContactpersonuserid());
             return preparedStatement;
@@ -116,7 +112,7 @@ public class UserController {
     @PutMapping("/id}/groupid")
     public int updateUserGroupid(@PathVariable Integer id, @RequestBody User user) {
         String sql = "UPDATE users SET groupid = ? WHERE id=?";
-        return jdbc.update(sql, new Object[]{user.getGroupId(), id});
+        return jdbc.update(sql, new Object[]{user.getGroupid(), id});
     }
     
     @PutMapping("/{id}/completed")
