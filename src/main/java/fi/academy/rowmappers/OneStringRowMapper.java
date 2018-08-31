@@ -14,6 +14,8 @@ public class OneStringRowMapper implements RowMapper {
     
     @Override
     public String[] mapRow(ResultSet resultSet, int i) throws SQLException {
+
         return (String[])resultSet.getArray(columnLabel).getArray();
+//        Object[] objArr = resultSet.getArray(columnLabel).
     }
 }

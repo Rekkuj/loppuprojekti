@@ -31,7 +31,7 @@ public class UserController {
 
 //    @PreAuthorize("hasAuthority('read:users')")
     @GetMapping()
-    public List<User> users() {
+    public List<User> getAllUsers() {
         List<User> result = jdbc.query("select * from users",
                 (ResultSet rs, int index) -> {
                 String[] ifCompletedtaskNull;
@@ -45,7 +45,7 @@ public class UserController {
                             rs.getString("username"),
                             rs.getString("role"),
                             rs.getInt("points"),
-                            rs.getInt("groupId"),
+                            rs.getInt("groupid"),
                             ifCompletedtaskNull,
                             rs.getInt("contactpersonuserid"),
                             rs.getString("testid"));
@@ -72,8 +72,8 @@ public class UserController {
     @GetMapping("/{username}/username")
     public User getOneUserByUsername(@PathVariable String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
-        String sql = "SELECT * FROM users WHERE username=?";
-        return jdbc.queryForObject(sql, userRowMapper, username);
+            String sql = "SELECT * FROM users WHERE username=?";
+            return jdbc.queryForObject(sql, userRowMapper, username);
     }
     
     @GetMapping("/{id}/completedtasks")
@@ -94,7 +94,7 @@ public class UserController {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getRole());
             preparedStatement.setInt(3, 0);
-            preparedStatement.setInt(4, user.getGroupId());
+            preparedStatement.setInt(4, user.getGroupid());
             preparedStatement.setArray(5, connection.createArrayOf("text", user.getCompletedtasks()));
             preparedStatement.setInt(6, user.getContactpersonuserid());
             return preparedStatement;
@@ -125,7 +125,7 @@ public class UserController {
     @PutMapping("/id}/groupid")
     public int updateUserGroupid(@PathVariable Integer id, @RequestBody User user) {
         String sql = "UPDATE users SET groupid = ? WHERE id=?";
-        return jdbc.update(sql, new Object[]{user.getGroupId(), id});
+        return jdbc.update(sql, new Object[]{user.getGroupid(), id});
     }
     
     @PutMapping("/{id}/completed")

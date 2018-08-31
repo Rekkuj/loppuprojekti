@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public class UserRowMapper implements RowMapper<User> {
     
@@ -14,14 +15,15 @@ public class UserRowMapper implements RowMapper<User> {
         if (userRow.getArray("completedtasks")==null) {
             ifCompletedtaskNull = new String[0];
         } else {
-            ifCompletedtaskNull = (String[])userRow.getArray("completedtasks").getArray();
+            Object[] o = (Object[])userRow.getArray("completedtasks").getArray();
+            ifCompletedtaskNull = Arrays.asList(o).toArray(new String[0]);
         }
         User user = new User();
         user.setId(userRow.getInt("id"));
         user.setUsername(userRow.getString("username"));
         user.setRole(userRow.getString("role"));
         user.setPoints(userRow.getInt("points"));
-        user.setGroupId(userRow.getInt("groupId"));
+        user.setGroupid(userRow.getInt("groupId"));
         user.setCompletedtasks(ifCompletedtaskNull);
         user.setContactpersonuserid(userRow.getInt("contactpersonuserid"));
         user.setTestid(userRow.getString("testid"));

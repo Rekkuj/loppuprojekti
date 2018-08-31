@@ -13,7 +13,7 @@ public class User {
     private String username;
     private String role;
     private Integer points;
-    private Integer groupId;
+    private Integer groupid;
     private String[] completedtasks;
     private Integer contactpersonuserid;
     //MIIKA TESTAA
@@ -42,39 +42,38 @@ public class User {
     public User() {
     }
 
-    public User(Integer id, String username, String role, Integer points, Integer groupId, String[] completedtasks) {
+    public User(Integer id, String username, String role, Integer points, Integer groupid, String[] completedtasks) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
-        this.groupId = groupId;
+        this.groupid = groupid;
         this.completedtasks = completedtasks!=null ? completedtasks : new String[0];
     }
     
-    public User(int id, String username, String role, int points, int groupId) {
+    public User(int id, String username, String role, int points, int groupid) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
-        this.groupId = groupId;
+        this.groupid = groupid;
     }
     
-    public User(int id, String username, String role, int points, int groupId, String[] completedtasks, int contactpersonuserid) {
+    public User(int id, String username, String role, int points, int groupid, String[] completedtasks, int contactpersonuserid) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
-        this.groupId = groupId;
+        this.groupid = groupid;
         this.completedtasks = completedtasks==null ? new String[0] : completedtasks;
         this.contactpersonuserid = contactpersonuserid;
     }
     
-    public User(int id, String username, String role, int points, int groupId, int contactpersonuserid) {
-        this.id = id;
+    public User(String username, String role, int points, int groupid, int contactpersonuserid) {
         this.username = username;
         this.role = role;
         this.points = points;
-        this.groupId = groupId;
+        this.groupid = groupid;
         this.contactpersonuserid = contactpersonuserid;
     }
     
@@ -110,12 +109,12 @@ public class User {
         this.points = points;
     }
 
-    public Integer getGroupId() {
-        return groupId;
+    public Integer getGroupid() {
+        return groupid;
     }
 
-    public void setGroupId(Integer groupId) {
-        this.groupId = groupId;
+    public void setGroupid(Integer groupid) {
+        this.groupid = groupid;
     }
     
     public String[] getCompletedtasks() {
