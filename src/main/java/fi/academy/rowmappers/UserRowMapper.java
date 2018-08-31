@@ -24,6 +24,7 @@ public class UserRowMapper implements RowMapper<User> {
         user.setGroupId(userRow.getInt("groupId"));
         user.setCompletedtasks(ifCompletedtaskNull);
         user.setContactpersonuserid(userRow.getInt("contactpersonuserid"));
+        user.setTestid(userRow.getString("testid"));
         return user;
     }
 }
