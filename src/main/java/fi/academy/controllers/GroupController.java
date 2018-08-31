@@ -35,13 +35,17 @@ public class GroupController {
                 if (rs.getArray("teachers")==null){
                     ifTeachersNull = new String[0];
                 } else {
-                    ifTeachersNull = (String[])rs.getArray("teachers").getArray();
+//                    ifTeachersNull = (String[])rs.getArray("teachers").getArray();
+                    Object[] o = (Object[])rs.getArray("teachers").getArray();
+                    ifTeachersNull = Arrays.asList(o).toArray(new String[0]);
                 }
                 String[] ifPupilsNull;
                 if (rs.getArray("pupils")==null) {
                     ifPupilsNull = new String[0];
                 } else {
-                    ifPupilsNull =(String[])rs.getArray("pupils").getArray();
+//                    ifPupilsNull =(String[])rs.getArray("pupils").getArray();
+                    Object[] o = (Object[])rs.getArray("pupils").getArray();
+                    ifPupilsNull = Arrays.asList(o).toArray(new String[0]);
                 }
                     return new Group(
                             rs.getInt("groupid"),

@@ -19,7 +19,16 @@ public class User {
     
     public User() {
     }
-
+    
+    public User(String username, String role, Integer points, Integer groupid, String[] completedtasks, Integer contactpersonuserid) {
+        this.username = username;
+        this.role = role;
+        this.points = points;
+        this.groupid = groupid;
+        this.completedtasks = completedtasks;
+        this.contactpersonuserid = contactpersonuserid;
+    }
+    
     public User(Integer id, String username, String role, Integer points, Integer groupid, String[] completedtasks) {
         this.id = id;
         this.username = username;

@@ -35,7 +35,9 @@ public class UserController {
                 if (rs.getArray("completedtasks")==null) {
                     ifCompletedtaskNull = new String[0];
                 } else {
-                    ifCompletedtaskNull = (String[])rs.getArray("completedtasks").getArray();
+//                    ifCompletedtaskNull = (String[])rs.getArray("completedtasks").getArray();
+                    Object[] o = (Object[])rs.getArray("completedtasks").getArray();
+                    ifCompletedtaskNull = Arrays.asList(o).toArray(new String[0]);
                 }
                     return new User(
                             rs.getInt("id"),

@@ -1,6 +1,7 @@
 package fi.academy.controllers;
 
 import fi.academy.LoppuprojektiApplication;
+import fi.academy.entities.User;
 import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertTrue;
+import java.net.URI;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LoppuprojektiApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,22 +33,32 @@ public class UserControllerTest {
     
     HttpHeaders headers = new HttpHeaders();
     
-    @Test
-    public void contextLoads(){
-    
-        HttpEntity<String> entity = new HttpEntity<>(null, headers);
-        
-        response = this.restTemplate.getForObject("/groups", String.class);
-        
-        ResponseEntity<String> responseEntity = restTemplate.exchange(urlWithPort("/groups"), HttpMethod.GET, entity, String.class);
-        actual = responseEntity.getBody().toString();
-        assertTrue(actual.contains("groupname"));
-    }
-    
     private String urlWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
     
+    /*Check that context loads and responsebody contains user "Jermu"*/
+    @Test
+    public void contextLoads(){
+
+        HttpEntity<String> entity = new HttpEntity<>(null, headers);
+        
+        response = this.restTemplate.getForObject("/users", String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(urlWithPort("/users"), HttpMethod.GET, entity, String.class);
+        actual = responseEntity.getBody().toString();
+        assertTrue(actual.contains("{\"id\":1,\"username\":\"Jermu\",\"role\":\"Testaaja\",\"points\":2000,\"groupid\":1,\"completedtasks\":[\"Himmeli\",\"Helpperi\"],\"contactpersonuserid\":1}"));
+    }
+    
+    /*Check that context loads and responsebody contains user "Jermu"*/
+    @Test
+    public void getAllUsersTest(){
+        ResponseEntity<List<User>> responseEntity = restTemplate.exchange(urlWithPort("/users"), HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
+        });
+        List<User> user = responseEntity.getBody();
+        assertTrue(user.size()==6);
+    }
+    
+    /* Call GET by username */
     @Test
     public void getOneUserByUsernameTest() throws JSONException {
         response = this.restTemplate.getForObject("/users/Rekku/username", String.class);
@@ -60,10 +72,27 @@ public class UserControllerTest {
                 "}", response, false);
     }
 
+    /* Check if Jermu user's completedtasks equals Himmeli and Helpperi */
     @Test
     public void getCompletedTasksForUserTest() throws JSONException {
         response = this.restTemplate.getForObject("/users/1/completedtasks", String.class);
         JSONAssert.assertEquals("[\"Himmeli\", \"Helpperi\"]", response, false);
     }
     
+    /* Check if creating a user is successful*/
+    @Test
+    public void insertUserTest() {
+        User user = new User("Kettu", "Kekkuloija", 500, 1, null, 3);
+        
+        ResponseEntity<User> responseEntity = restTemplate.postForEntity(urlWithPort("/users"), user, User.class);
+        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
+        
+        /* Check location for creating testLocation*/
+        String location = responseEntity.getHeaders().getLocation().getPath();
+        String testLocation = URI.create(location).getPath();
+        responseEntity = restTemplate.getForEntity(testLocation, User.class);
+        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
+        User insertedUser = responseEntity.getBody();
+        assertTrue(insertedUser.equals(user));
+    }
 }
