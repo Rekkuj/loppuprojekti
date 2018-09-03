@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -32,8 +31,7 @@ public class UserController {
     public UserController(@Autowired JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
-
-//    @PreAuthorize("hasAuthority('read:users')")
+    
     @GetMapping()
     public List<User> getAllUsers(){
         List<User> result = jdbc.query("select * from users",
@@ -54,39 +52,45 @@ public class UserController {
                             rs.getInt("groupid"),
                             ifCompletedtaskNull,
                             rs.getInt("contactpersonuserid"),
-                            rs.getString("testid"));
+                            rs.getString("authid"));
                 });
         return result;
     }
     
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getOneUserById(@PathVariable Integer id) {
-//        RowMapper<User> userRowMapper = new UserRowMapper();
-//        String sql = "SELECT * FROM users WHERE id=?";
-//        try {
-//            User user = jdbc.queryForObject(sql, userRowMapper, id);
-//            return new ResponseEntity<User>(user, HttpStatus.OK);
-//        } catch (EmptyResultDataAccessException dataAccessException) {
-//
-//            return ResponseEntity
-//                    .status(HttpStatus.NOT_FOUND)
-//                    .body("User not found with id: " + id);
-
-    @GetMapping("/{id}/id")
-    public User getOneUserById(@PathVariable String id, Principal principal) {
-        System.out.println("Käyttäjä " + principal.getName());
-        System.out.println("ID " + id);
-        System.out.println(principal.getName().getClass());
-        String queryId = id.equals(principal.getName()) ? id : null;
-        System.out.println("QueryId " + queryId);
-        try{
-            RowMapper<User> userRowMapper = new UserRowMapper();
-            String sql = "SELECT * FROM users WHERE testid=?";
-            return jdbc.queryForObject(sql, userRowMapper,queryId);
-        } catch (NotAuthorizedException err){
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOneUserById(@PathVariable String id, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String sql = "SELECT * FROM users WHERE authid=?";
+        try {
+            String queryId = id.equals(principal.getName()) ? id : null;
+            System.out.println(queryId);
+            User user = jdbc.queryForObject(sql, userRowMapper, queryId);
+            System.out.println(user);
+            return new ResponseEntity<User>(user, HttpStatus.OK);
+        } catch (NotAuthorizedException err) {
             throw err;
+        } catch (EmptyResultDataAccessException dataAccessException) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User not found with id: " + id);
         }
     }
+
+//    @GetMapping("/{id}/id")
+//    public User getOneUserById(@PathVariable String id, Principal principal) {
+//        System.out.println("Käyttäjä " + principal.getName());
+//        System.out.println("ID " + id);
+//        System.out.println(principal.getName().getClass());
+//        String queryId = id.equals(principal.getName()) ? id : null;
+//        System.out.println("QueryId " + queryId);
+//        try{
+//            RowMapper<User> userRowMapper = new UserRowMapper();
+//            String sql = "SELECT * FROM users WHERE testid=?";
+//            return jdbc.queryForObject(sql, userRowMapper,queryId);
+//        } catch (NotAuthorizedException err){
+//            throw err;
+//        }
+//    }
     
     public User getOneUserByUsername(@RequestParam String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
@@ -104,7 +108,7 @@ public class UserController {
     @PostMapping()
     public User insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid, testid) values (?, ?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid, authid) values (?, ?, ?, ?, ?, ?,?)";
         
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
@@ -115,7 +119,7 @@ public class UserController {
             preparedStatement.setInt(4, user.getGroupid());
             preparedStatement.setArray(5, connection.createArrayOf("text", user.getCompletedtasks()));
             preparedStatement.setInt(6, user.getContactpersonuserid());
-            preparedStatement.setString(7, user.getTestid());
+            preparedStatement.setString(7, user.getAuthid());
             return preparedStatement;
         };
         

@@ -15,6 +15,7 @@ CREATE TABLE users (
     completedtasks array,
     groupid int,
     contactpersonuserid int,
+    authid varchar,
     CONSTRAINT USERS_GROUPS_GROUPID_fk FOREIGN KEY (groupid) REFERENCES GROUPS (GROUPID),
 	  CONSTRAINT USERS_USERS_ID_fk FOREIGN KEY (CONTACTPERSONUSERID) REFERENCES USERS (ID)
 );
