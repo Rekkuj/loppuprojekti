@@ -12,23 +12,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-import fi.academy.entities.Group;
-import fi.academy.rowmappers.GroupRowMapper;
-import fi.academy.rowmappers.OneStringRowMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @RestController
 @RequestMapping("/missions")

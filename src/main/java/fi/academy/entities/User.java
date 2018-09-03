@@ -32,7 +32,6 @@ public class User {
 
     public String getAuthid() {
         return authid;
-
     }
 
     public void setAuthid(String authid) {
