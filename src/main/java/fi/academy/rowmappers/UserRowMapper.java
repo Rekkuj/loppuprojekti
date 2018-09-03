@@ -11,12 +11,12 @@ public class UserRowMapper implements RowMapper<User> {
     
     @Override
     public User mapRow(ResultSet userRow, int id) throws SQLException {
-        String[] ifCompletedtaskNull;
-        if (userRow.getArray("completedtasks")==null) {
-            ifCompletedtaskNull = new String[0];
+        String[] ifCompletedmissionNull;
+        if (userRow.getArray("completedmissions")==null) {
+            ifCompletedmissionNull = new String[0];
         } else {
-            Object[] o = (Object[])userRow.getArray("completedtasks").getArray();
-            ifCompletedtaskNull = Arrays.asList(o).toArray(new String[0]);
+            Object[] o = (Object[])userRow.getArray("completedmissions").getArray();
+            ifCompletedmissionNull = Arrays.asList(o).toArray(new String[0]);
         }
         User user = new User();
         user.setId(userRow.getInt("id"));
@@ -24,7 +24,7 @@ public class UserRowMapper implements RowMapper<User> {
         user.setRole(userRow.getString("role"));
         user.setPoints(userRow.getInt("points"));
         user.setGroupid(userRow.getInt("groupId"));
-        user.setCompletedtasks(ifCompletedtaskNull);
+        user.setCompletedmissions(ifCompletedmissionNull);
         user.setContactpersonuserid(userRow.getInt("contactpersonuserid"));
         user.setAuthid(userRow.getString("authid"));
         return user;
