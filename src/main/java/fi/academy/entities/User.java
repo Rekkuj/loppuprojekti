@@ -16,7 +16,29 @@ public class User {
     private Integer groupid;
     private String[] completedtasks;
     private Integer contactpersonuserid;
-    
+    //MIIKA TESTAA
+    private String testid;
+
+    public User(int id, String username, String role, Integer points, Integer groupId, String[] completedtasks, Integer contactpersonuserid, String testid) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+        this.points = points;
+        this.groupid = groupId;
+        this.completedtasks = completedtasks;
+        this.contactpersonuserid = contactpersonuserid;
+        this.testid = testid;
+    }
+
+    public String getTestid() {
+        return testid;
+
+    }
+
+    public void setTestid(String testid) {
+        this.testid = testid;
+    }
+
     public User() {
     }
     
