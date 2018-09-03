@@ -26,7 +26,7 @@ public class UserRowMapper implements RowMapper<User> {
         user.setGroupid(userRow.getInt("groupId"));
         user.setCompletedtasks(ifCompletedtaskNull);
         user.setContactpersonuserid(userRow.getInt("contactpersonuserid"));
-        user.setTestid(userRow.getString("testid"));
+        user.setAuthid(userRow.getString("authid"));
         return user;
     }
 }

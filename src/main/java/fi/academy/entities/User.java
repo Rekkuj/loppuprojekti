@@ -17,9 +17,9 @@ public class User {
     private String[] completedtasks;
     private Integer contactpersonuserid;
     //MIIKA TESTAA
-    private String testid;
+    private String authid;
 
-    public User(int id, String username, String role, Integer points, Integer groupId, String[] completedtasks, Integer contactpersonuserid, String testid) {
+    public User(int id, String username, String role, Integer points, Integer groupId, String[] completedtasks, Integer contactpersonuserid, String authid) {
         this.id = id;
         this.username = username;
         this.role = role;
@@ -27,16 +27,16 @@ public class User {
         this.groupid = groupId;
         this.completedtasks = completedtasks;
         this.contactpersonuserid = contactpersonuserid;
-        this.testid = testid;
+        this.authid = authid;
     }
 
-    public String getTestid() {
-        return testid;
+    public String getAuthid() {
+        return authid;
 
     }
 
-    public void setTestid(String testid) {
-        this.testid = testid;
+    public void setAuthid(String authid) {
+        this.authid = authid;
     }
 
     public User() {

@@ -22,7 +22,7 @@ public class LoppuprojektiApplication {
 
     @RequestMapping("api/user")
     public Principal user(Principal principal) {
-//        System.out.println("Tuli pyynto: " + principal.toString());
+
         return principal;
     }
 
