@@ -1,5 +1,6 @@
 package fi.academy.controllers;
 
+import fi.academy.controllers.UserController;
 import fi.academy.LoppuprojektiApplication;
 import fi.academy.entities.User;
 import org.json.JSONException;
@@ -27,6 +28,9 @@ public class UserControllerTest {
     private int port;
     private String response;
     private String actual;
+    
+    @Autowired
+    UserController userController;
     
     @Autowired
     private TestRestTemplate restTemplate;
@@ -71,6 +75,20 @@ public class UserControllerTest {
                 "    \"contactpersonuserid\": 1\n" +
                 "}", response, false);
     }
+    
+    /* Call GET by id */
+    @Test
+    public void getOneUserByIdTest() throws JSONException {
+        response = this.restTemplate.getForObject("/users/4/id", String.class);
+        JSONAssert.assertEquals("{\n" +
+                "    \"username\": \"Rekku\",\n" +
+                "    \"role\": \"Testaaja\",\n" +
+                "    \"points\": 2000,\n" +
+                "    \"groupid\": 2,\n" +
+                "    \"completedtasks\": [\"Orvokki\", \"Ruiskaunokki\"],\n" +
+                "    \"contactpersonuserid\": 1\n" +
+                "}", response, false);
+    }
 
     /* Check if Jermu user's completedtasks equals Himmeli and Helpperi */
     @Test
@@ -94,5 +112,22 @@ public class UserControllerTest {
         assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
         User insertedUser = responseEntity.getBody();
         assertTrue(insertedUser.equals(user));
+    }
+    
+    @Test
+    public void UpdateUsernameTest() throws Exception {
+        User firstUser = getFirstUserFromDBTest();
+        String url = urlWithPort("/users" + firstUser.getUsername() + "/username");
+        String originalUsername = String.valueOf(userController.getOneUserByUsername(firstUser.getUsername()));
+        String updatedUsername = originalUsername + "_updated";
+        firstUser.setUsername(updatedUsername);
+        RequestEntity<User> requestEntity = new RequestEntity<>(firstUser, HttpMethod.PUT, new URI(url));
+        ResponseEntity<User> responseEntity = restTemplate.exchange(requestEntity, User.class);
+        assertEquals(updatedUsername, firstUser.getUsername());
+    }
+    
+    private User getFirstUserFromDBTest() {
+        List<User> allUsers = userController.getAllUsers();
+        return allUsers.isEmpty() ? null : allUsers.get(0);
     }
 }
