@@ -44,7 +44,6 @@ public class UserControllerTest {
     /*Check that context loads and responsebody contains user "Jermu"*/
     @Test
     public void getJermuUser(){
-
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
         headers.set("Authorization: Bearer", "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1UYzJNVU5CUkVaQk1EYzJSa0ZHUWtOR016UXpNVGt5TWpnNE5UVTRRVFpHTVRVd056VkNNQSJ9.eyJpc3MiOiJodHRwczovL2plcm11LmV1LmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw1YjhkMDdhYWQwOWE2YjExMWI0ZmU0N2MiLCJhdWQiOlsiaHR0cDovL2Vsc2EiLCJodHRwczovL2plcm11LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE1MzU5NzA5NTEsImV4cCI6MTUzNTk3ODE1MSwiYXpwIjoiZXRUQ1RTRFppNmV2M2VLUW9tS1VBMjNZRXdFMEQ3bXciLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIn0.09vlViddqOUzcZmNnCiEPVbsIAnLqhvaDNHvRY9bQbbOnMAt3Jy7DdLO-WhctiBr7CM7nOwN0aI6paa0UyCWep1g1OpLBZCJJZ13Csq2nmkYcM78O6--pNrFzmQ4nvRnh4GUcrf7nUZ0bWVF5o97RPAagGmkAng5Vl-LXoG38XqfEJ4CJnlX0a467a3Vs6MjpeGLAPFmNSSIEjco8rbC9BCbfv1zvH1-ebA3FB9u5Svgu72JlBTKrdMf8vQp4gRn4GGQIPUTiSu4xbiTAcjNi0dpF7l0xNKYVs0ua-LUY1P8mS6hGVRlWMhfFYfGyJKJRzFnbe0aZ94of2_IkviwaQ");
 //        Authorization: "Bearer " + eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1UYzJNVU5CUkVaQk1EYzJSa0ZHUWtOR016UXpNVGt5TWpnNE5UVTRRVFpHTVRVd056VkNNQSJ9.eyJpc3MiOiJodHRwczovL2plcm11LmV1LmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw1YjhkMDdhYWQwOWE2YjExMWI0ZmU0N2MiLCJhdWQiOlsiaHR0cDovL2Vsc2EiLCJodHRwczovL2plcm11LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE1MzU5NzA5NTEsImV4cCI6MTUzNTk3ODE1MSwiYXpwIjoiZXRUQ1RTRFppNmV2M2VLUW9tS1VBMjNZRXdFMEQ3bXciLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIn0.09vlViddqOUzcZmNnCiEPVbsIAnLqhvaDNHvRY9bQbbOnMAt3Jy7DdLO-WhctiBr7CM7nOwN0aI6paa0UyCWep1g1OpLBZCJJZ13Csq2nmkYcM78O6--pNrFzmQ4nvRnh4GUcrf7nUZ0bWVF5o97RPAagGmkAng5Vl-LXoG38XqfEJ4CJnlX0a467a3Vs6MjpeGLAPFmNSSIEjco8rbC9BCbfv1zvH1-ebA3FB9u5Svgu72JlBTKrdMf8vQp4gRn4GGQIPUTiSu4xbiTAcjNi0dpF7l0xNKYVs0ua-LUY1P8mS6hGVRlWMhfFYfGyJKJRzFnbe0aZ94of2_IkviwaQ
@@ -131,5 +130,8 @@ public class UserControllerTest {
     private User getFirstUserFromDBTest() {
         List<User> allUsers = userController.getAllUsers();
         return allUsers.isEmpty() ? null : allUsers.get(0);
+    }
+    
+    private void getAuthorization() {
     }
 }

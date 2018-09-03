@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/missions")
 public class MissionsController {
     private JdbcTemplate jdbc;
 
@@ -41,7 +41,7 @@ public class MissionsController {
 
     @GetMapping()
     public List<Missions> getAllTasks() {
-        List<Missions> result = jdbc.query("select * from tasks",
+        List<Missions> result = jdbc.query("select * from missions",
                 (ResultSet rs, int index) -> {
                     return new Missions(
                             rs.getInt("id"),
@@ -57,7 +57,7 @@ public class MissionsController {
     @PostMapping()
     public String insertMission (@RequestBody Missions missions) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO tasks (taskname, componentname) values (?,?)";
+        String sql = "INSERT INTO missions (taskname, componentname) values (?,?)";
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);

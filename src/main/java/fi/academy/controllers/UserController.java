@@ -99,9 +99,9 @@ public class UserController {
     }
     
     @GetMapping("/{id}/completedtasks")
-    public String[] getCompletedTasksForUser(@PathVariable Integer id) {
+    public String[] getCompletedTasksForUser(@PathVariable String id) {
         RowMapper<String[]> completedTasksRowMapper = new OneStringRowMapper("completedtasks");
-        String sql = "SELECT completedtasks FROM users WHERE id=?";
+        String sql = "SELECT completedtasks FROM users WHERE authid=?";
         return jdbc.queryForObject(sql, completedTasksRowMapper, id);
     }
     
@@ -141,22 +141,22 @@ public class UserController {
         return jdbc.update(sql, new Object[]{user.getRole(), id});
     }
     
-    @PutMapping("/id}/points")
-    public int updateUserPoints(@PathVariable Integer id, @RequestBody User user) {
-        String sql = "UPDATE users SET points = ? WHERE id=?";
+    @PutMapping("/{id}/points")
+    public int updateUserPoints(@PathVariable String id, @RequestBody User user) {
+        String sql = "UPDATE users SET points = ? WHERE authid=?";
         return jdbc.update(sql, new Object[]{user.getPoints(), id});
     }
     
-    @PutMapping("/id}/groupid")
-    public int updateUserGroupid(@PathVariable Integer id, @RequestBody User user) {
-        String sql = "UPDATE users SET groupid = ? WHERE id=?";
+    @PutMapping("/{id}/groupid")
+    public int updateUserGroupid(@PathVariable String id, @RequestBody User user) {
+        String sql = "UPDATE users SET groupid = ? WHERE authid=?";
         return jdbc.update(sql, new Object[]{user.getGroupid(), id});
     }
     
     @PutMapping("/{id}/completed")
-    public String updateUserCompletedtasks(@PathVariable Integer id, @RequestBody User user) {
+    public String updateUserCompletedtasks(@PathVariable String id, @RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "UPDATE users SET completedtasks = ? WHERE id=?";
+        String sql = "UPDATE users SET completedtasks = ? WHERE authid=?";
         ArrayList<String> existingCompletedTasks = new ArrayList<>(Arrays.asList(getCompletedTasksForUser(id)));
         for (String task : user.getCompletedtasks()) {
             existingCompletedTasks.add(task);
@@ -170,7 +170,7 @@ public class UserController {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTasks));
-            preparedStatement.setInt(2, id);
+            preparedStatement.setString(2, id);
             return preparedStatement;
         };
         
@@ -178,9 +178,9 @@ public class UserController {
         return kh.getKeys().toString();
     }
     
-    @PutMapping("/id}/contact")
-    public int updateUserContactpersonuserid(@PathVariable Integer id, @RequestBody User user) {
-        String sql = "UPDATE users SET contactpersonuserid = ? WHERE id=?";
+    @PutMapping("/{id}/contact")
+    public int updateUserContactpersonuserid(@PathVariable String id, @RequestBody User user) {
+        String sql = "UPDATE users SET contactpersonuserid = ? WHERE authid=?";
         return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
     }
 
