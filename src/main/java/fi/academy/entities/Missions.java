@@ -12,17 +12,17 @@ public class Missions {
     @Id
     @GeneratedValue
     private Integer id;
-    private String taskname;
+    private String missionname;
     private String componentname;
 
-    public Missions(Integer id, String taskname, String componentname) {
+    public Missions(Integer id, String missionname, String componentname) {
         this.id = id;
-        this.taskname = taskname;
+        this.missionname = missionname;
         this.componentname = componentname;
     }
 
-    public Missions(String taskname, String componentname) {
-        this.taskname = taskname;
+    public Missions(String missionname, String componentname) {
+        this.missionname = missionname;
         this.componentname = componentname;
     }
 
@@ -37,12 +37,12 @@ public class Missions {
         this.id = id;
     }
 
-    public String getTaskname() {
-        return taskname;
+    public String getMissionname() {
+        return missionname;
     }
 
-    public void setTaskname(String taskname) {
-        this.taskname = taskname;
+    public void setMissionname(String missionname) {
+        this.missionname = missionname;
     }
 
     public String getComponentname() {

@@ -12,7 +12,7 @@ CREATE TABLE users (
     username varchar NOT NULL,
     role varchar,
     points int,
-    completedtasks array,
+    completedmissions array,
     groupid int,
     contactpersonuserid int,
     authid varchar,

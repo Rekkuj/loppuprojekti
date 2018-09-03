@@ -14,18 +14,18 @@ public class User {
     private String role;
     private Integer points;
     private Integer groupid;
-    private String[] completedtasks;
+    private String[] completedmissions;
     private Integer contactpersonuserid;
     //MIIKA TESTAA
     private String authid;
 
-    public User(int id, String username, String role, Integer points, Integer groupId, String[] completedtasks, Integer contactpersonuserid, String authid) {
+    public User(int id, String username, String role, Integer points, Integer groupId, String[] completedmissions, Integer contactpersonuserid, String authid) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupid = groupId;
-        this.completedtasks = completedtasks;
+        this.completedmissions = completedmissions;
         this.contactpersonuserid = contactpersonuserid;
         this.authid = authid;
     }
@@ -41,22 +41,22 @@ public class User {
     public User() {
     }
     
-    public User(String username, String role, Integer points, Integer groupid, String[] completedtasks, Integer contactpersonuserid) {
+    public User(String username, String role, Integer points, Integer groupid, String[] completedmissions, Integer contactpersonuserid) {
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupid = groupid;
-        this.completedtasks = completedtasks;
+        this.completedmissions = completedmissions;
         this.contactpersonuserid = contactpersonuserid;
     }
     
-    public User(Integer id, String username, String role, Integer points, Integer groupid, String[] completedtasks) {
+    public User(Integer id, String username, String role, Integer points, Integer groupid, String[] completedmissions) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupid = groupid;
-        this.completedtasks = completedtasks!=null ? completedtasks : new String[0];
+        this.completedmissions = completedmissions !=null ? completedmissions : new String[0];
     }
     
     public User(int id, String username, String role, int points, int groupid) {
@@ -67,13 +67,13 @@ public class User {
         this.groupid = groupid;
     }
     
-    public User(int id, String username, String role, int points, int groupid, String[] completedtasks, int contactpersonuserid) {
+    public User(int id, String username, String role, int points, int groupid, String[] completedmissions, int contactpersonuserid) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupid = groupid;
-        this.completedtasks = completedtasks==null ? new String[0] : completedtasks;
+        this.completedmissions = completedmissions ==null ? new String[0] : completedmissions;
         this.contactpersonuserid = contactpersonuserid;
     }
     
@@ -125,12 +125,12 @@ public class User {
         this.groupid = groupid;
     }
     
-    public String[] getCompletedtasks() {
-        return completedtasks;
+    public String[] getCompletedmissions() {
+        return completedmissions;
     }
     
-    public void setCompletedtasks(String[] completedtask) {
-        this.completedtasks = completedtask;
+    public void setCompletedmissions(String[] completedtask) {
+        this.completedmissions = completedtask;
     }
     
     public Integer getContactpersonuserid() {

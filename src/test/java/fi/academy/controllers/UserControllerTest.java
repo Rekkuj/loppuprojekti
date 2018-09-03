@@ -51,7 +51,7 @@ public class UserControllerTest {
         response = this.restTemplate.getForObject("/users", String.class);
         ResponseEntity<String> responseEntity = restTemplate.exchange(urlWithPort("/users"), HttpMethod.GET, entity, String.class);
         actual = responseEntity.getBody().toString();
-        assertTrue(actual.contains("{\"id\":1,\"username\":\"Jermu\",\"role\":\"Testaaja\",\"points\":2000,\"groupid\":1,\"completedtasks\":[\"Himmeli\",\"Helpperi\"],\"contactpersonuserid\":1}"));
+        assertTrue(actual.contains("{\"id\":1,\"username\":\"Jermu\",\"role\":\"Testaaja\",\"points\":2000,\"groupid\":1,\"completedmissions\":[\"Himmeli\",\"Helpperi\"],\"contactpersonuserid\":1}"));
     }
     
     /*Check that context loads and responsebody contains user "Jermu"*/
@@ -72,7 +72,7 @@ public class UserControllerTest {
                 "    \"role\": \"Testaaja\",\n" +
                 "    \"points\": 2000,\n" +
                 "    \"groupid\": 2,\n" +
-                "    \"completedtasks\": [\"Orvokki\", \"Ruiskaunokki\"],\n" +
+                "    \"completedmissions\": [\"Orvokki\", \"Ruiskaunokki\"],\n" +
                 "    \"contactpersonuserid\": 1\n" +
                 "}", response, false);
     }
@@ -86,7 +86,7 @@ public class UserControllerTest {
                 "    \"role\": \"Testaaja\",\n" +
                 "    \"points\": 2000,\n" +
                 "    \"groupid\": 2,\n" +
-                "    \"completedtasks\": [\"Orvokki\", \"Ruiskaunokki\"],\n" +
+                "    \"completedmissions\": [\"Orvokki\", \"Ruiskaunokki\"],\n" +
                 "    \"contactpersonuserid\": 1\n" +
                 "}", response, false);
     }
@@ -94,7 +94,7 @@ public class UserControllerTest {
     /* Check if Jermu user's completedtasks equals Himmeli and Helpperi */
     @Test
     public void getCompletedTasksForUserTest() throws JSONException {
-        response = this.restTemplate.getForObject("/users/1/completedtasks", String.class);
+        response = this.restTemplate.getForObject("/users/1/completedmissions", String.class);
         JSONAssert.assertEquals("[\"Himmeli\", \"Helpperi\"]", response, false);
     }
     

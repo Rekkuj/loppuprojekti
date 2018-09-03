@@ -44,7 +44,7 @@ public class MissionsController {
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1,missions.getTaskname());
+            preparedStatement.setString(1,missions.getMissionname());
             preparedStatement.setString(2, missions.getComponentname());
             return preparedStatement;
         };
