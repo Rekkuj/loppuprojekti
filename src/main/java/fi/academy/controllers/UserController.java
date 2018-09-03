@@ -4,6 +4,9 @@ import fi.academy.entities.User;
 import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -28,7 +31,7 @@ public class UserController {
     }
     
     @GetMapping()
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers(){
         List<User> result = jdbc.query("select * from users",
                 (ResultSet rs, int index) -> {
                 String[] ifCompletedtaskNull;
@@ -51,18 +54,25 @@ public class UserController {
         return result;
     }
     
-    @GetMapping("/{id}/id")
-    public User getOneUserById(@PathVariable Integer id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOneUserById(@PathVariable Integer id) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE id=?";
-        return jdbc.queryForObject(sql, userRowMapper, id);
+        try {
+            User user = jdbc.queryForObject(sql, userRowMapper, id);
+            return new ResponseEntity<User>(user, HttpStatus.OK);
+        } catch (EmptyResultDataAccessException dataAccessException) {
+            
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User not found with id: " + id);
+        }
     }
     
-    @GetMapping("/{username}/username")
-    public User getOneUserByUsername(@PathVariable String username) {
+    public User getOneUserByUsername(@RequestParam String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
-            String sql = "SELECT * FROM users WHERE username=?";
-            return jdbc.queryForObject(sql, userRowMapper, username);
+        String sql = "SELECT * FROM users WHERE username=?";
+        return jdbc.queryForObject(sql, userRowMapper, username);
     }
     
     @GetMapping("/{id}/completedtasks")
@@ -73,7 +83,7 @@ public class UserController {
     }
     
     @PostMapping()
-    public String insertUser(@RequestBody User user) {
+    public User insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
         String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid) values (?, ?, ?, ?, ?, ?)";
         
@@ -90,7 +100,9 @@ public class UserController {
         };
         
         jdbc.update(preparedStatementCreator, kh);
-        return kh.getKeys().toString();
+        Integer generatedId = (Integer)kh.getKeys().get("id");
+        user.setId(generatedId);
+        return user;
     }
     
     @PutMapping("/{id}/username")
