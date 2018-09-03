@@ -1,6 +1,7 @@
 package fi.academy.controllers;
 
 import fi.academy.entities.User;
+import fi.academy.exceptions.NotAuthorizedException;
 import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class UserController {
             RowMapper<User> userRowMapper = new UserRowMapper();
             String sql = "SELECT * FROM users WHERE testid=?";
             return jdbc.queryForObject(sql, userRowMapper,queryId);
-        } catch (Exception err){
+        } catch (NotAuthorizedException err){
             throw err;
         }
     }
@@ -86,7 +87,7 @@ public class UserController {
     @PostMapping()
     public String insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid) values (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid, testid) values (?, ?, ?, ?, ?, ?,?)";
         
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
@@ -97,6 +98,7 @@ public class UserController {
             preparedStatement.setInt(4, user.getGroupid());
             preparedStatement.setArray(5, connection.createArrayOf("text", user.getCompletedtasks()));
             preparedStatement.setInt(6, user.getContactpersonuserid());
+            preparedStatement.setString(7, user.getTestid());
             return preparedStatement;
         };
         

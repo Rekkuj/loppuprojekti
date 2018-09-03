@@ -24,7 +24,7 @@ public class User {
         this.username = username;
         this.role = role;
         this.points = points;
-        this.groupId = groupId;
+        this.groupid = groupId;
         this.completedtasks = completedtasks;
         this.contactpersonuserid = contactpersonuserid;
         this.testid = testid;
