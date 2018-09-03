@@ -9,8 +9,10 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -26,7 +28,8 @@ public class UserController {
     public UserController(@Autowired JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
-    
+
+//    @PreAuthorize("hasAuthority('read:users')")
     @GetMapping()
     public List<User> getAllUsers() {
         List<User> result = jdbc.query("select * from users",
@@ -46,16 +49,26 @@ public class UserController {
                             rs.getInt("points"),
                             rs.getInt("groupid"),
                             ifCompletedtaskNull,
-                            rs.getInt("contactpersonuserid"));
+                            rs.getInt("contactpersonuserid"),
+                            rs.getString("testid"));
                 });
         return result;
     }
     
     @GetMapping("/{id}/id")
-    public User getOneUserById(@PathVariable Integer id) {
-        RowMapper<User> userRowMapper = new UserRowMapper();
-        String sql = "SELECT * FROM users WHERE id=?";
-        return jdbc.queryForObject(sql, userRowMapper, id);
+    public User getOneUserById(@PathVariable String id, Principal principal) {
+        System.out.println("Käyttäjä " + principal.getName());
+        System.out.println("ID " + id);
+        System.out.println(principal.getName().getClass());
+        String queryId = id.equals(principal.getName()) ? id : null;
+        System.out.println("QueryId " + queryId);
+        try{
+            RowMapper<User> userRowMapper = new UserRowMapper();
+            String sql = "SELECT * FROM users WHERE testid=?";
+            return jdbc.queryForObject(sql, userRowMapper,queryId);
+        } catch (Exception err){
+            throw err;
+        }
     }
     
     @GetMapping("/{username}/username")
