@@ -89,7 +89,7 @@ public class UserController {
     @PostMapping()
     public String insertUser(@RequestBody User user) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid, testid) values (?, ?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO users (username, role, points, groupid, completedtasks, contactpersonuserid, authid) values (?, ?, ?, ?, ?, ?,?)";
         
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
@@ -100,7 +100,7 @@ public class UserController {
             preparedStatement.setInt(4, user.getGroupid());
             preparedStatement.setArray(5, connection.createArrayOf("text", user.getCompletedtasks()));
             preparedStatement.setInt(6, user.getContactpersonuserid());
-            preparedStatement.setString(7, user.getTestid());
+            preparedStatement.setString(7, user.getAuthid());
             return preparedStatement;
         };
         
