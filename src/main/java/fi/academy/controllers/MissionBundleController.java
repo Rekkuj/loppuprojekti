@@ -4,6 +4,7 @@ import fi.academy.entities.MissionBundle;
 import fi.academy.entities.User;
 import fi.academy.exceptions.NotAuthorizedException;
 import fi.academy.rowmappers.MissionBundleRowMapper;
+import fi.academy.rowmappers.OneIntegerRowMapper;
 import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class MissionBundleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOneMissionBundleById(@PathVariable String id, Principal principal) {
+    public ResponseEntity<?> getOneMissionBundleById(@PathVariable Integer id, Principal principal) {
         RowMapper<MissionBundle> missionBundleRowMapper = new MissionBundleRowMapper();
         String sql = "SELECT * FROM missionbundles WHERE bundleid=?";
         try {
@@ -79,14 +80,14 @@ public class MissionBundleController {
 
     @GetMapping("/{id}/belongstogroups")
     public Integer[] getBelongsToGroups(@PathVariable Integer id) {
-        RowMapper<Integer[]> belongsToGroupsRowMapper = new OneStringRowMapper("belongstogroups");
+        RowMapper<Integer[]> belongsToGroupsRowMapper = new OneIntegerRowMapper("belongstogroups");
         String sql = "SELECT belongstogroups FROM missionbundles WHERE bundleid=?";
         return jdbc.queryForObject(sql, belongsToGroupsRowMapper, id);
     }
 
     @GetMapping("/{id}/listofmissions")
     public Integer[] getListOfMissions(@PathVariable Integer id) {
-        RowMapper<Integer[]> listOfMissionsRowMapper = new OneStringRowMapper("listofmissions");
+        RowMapper<Integer[]> listOfMissionsRowMapper = new OneIntegerRowMapper("listofmissions");
         String sql = "SELECT listofmissions FROM missionbundles WHERE bundleid=?";
         return jdbc.queryForObject(sql, listOfMissionsRowMapper, id);
     }
@@ -111,59 +112,59 @@ public class MissionBundleController {
         return missionBundle;
     }
 
-    @PutMapping("/{id}/username")
-    public int updateUsername(@PathVariable Integer id, @RequestBody User user) {
-        String sql = "UPDATE users SET username = ? WHERE id=?";
-        return jdbc.update(sql, new Object[]{user.getUsername(), id});
+    @PutMapping("/{id}/bundlename")
+    public int updateMissionBundleName(@PathVariable Integer id, @RequestBody MissionBundle missionBundle) {
+        String sql = "UPDATE missionbundles SET bundlename = ? WHERE bundleid=?";
+        return jdbc.update(sql, new Object[]{missionBundle.getBundlename(), id});
     }
 
-    @PutMapping("/{id}/role")
-    public int updateUserRole(@PathVariable Integer id, @RequestBody User user) {
-        String sql = "UPDATE users SET role = ? WHERE id=?";
-        return jdbc.update(sql, new Object[]{user.getRole(), id});
+    @PutMapping("/{id}/changebelongstogroups")
+    public String updateBelongsToGroups(@PathVariable Integer id, @RequestBody MissionBundle missionBundle) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE missionbundles SET belongstogroups = ? WHERE bundleid=?";
+
+        ArrayList<Integer> existingBelongsToGroups = new ArrayList<>(Arrays.asList(getBelongsToGroups(id)));
+        for (Integer mission : missionBundle.getBelongstogroups()) {
+            existingBelongsToGroups.add(mission);
+        }
+        Integer[] updatedBelongsToGroups = new Integer[existingBelongsToGroups.size()];
+        updatedBelongsToGroups = existingBelongsToGroups.toArray(updatedBelongsToGroups);
+
+        Integer[] finalUpdatedBelongsToGroups = updatedBelongsToGroups;
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("int", finalUpdatedBelongsToGroups));
+            preparedStatement.setInt(2, id);
+            return preparedStatement;
+        };
+
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
     }
 
-    @PutMapping("/{id}/points")
-    public int updateUserPoints(@PathVariable String id, @RequestBody User user) {
-        String sql = "UPDATE users SET points = ? WHERE authid=?";
-        return jdbc.update(sql, new Object[]{user.getPoints(), id});
+    @PutMapping("/{id}/changelistofmissions")
+    public String updateListOfMissions(@PathVariable Integer id, @RequestBody MissionBundle missionBundle) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE missionbundles SET listofmissions = ? WHERE bundleid=?";
+
+        ArrayList<Integer> existingListOfMissions = new ArrayList<>(Arrays.asList(getListOfMissions(id)));
+        for (Integer mission : missionBundle.getListofmissions()) {
+            existingListOfMissions.add(mission);
+        }
+        Integer[] updatedListOfMissions = new Integer[existingListOfMissions.size()];
+        updatedListOfMissions = existingListOfMissions.toArray(updatedListOfMissions);
+
+        Integer[] finalUpdatedListOfMissions = updatedListOfMissions;
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("int", finalUpdatedListOfMissions));
+            preparedStatement.setInt(2, id);
+            return preparedStatement;
+        };
+
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
     }
-
-    @PutMapping("/{id}/groupid")
-    public int updateUserGroupid(@PathVariable String id, @RequestBody User user) {
-        String sql = "UPDATE users SET groupid = ? WHERE authid=?";
-        return jdbc.update(sql, new Object[]{user.getGroupid(), id});
-    }
-
-//    @PutMapping("/{id}/completed")
-//    public String updateUserCompletedmissions(@PathVariable String id, @RequestBody User user) {
-//        KeyHolder kh = new GeneratedKeyHolder();
-//        String sql = "UPDATE users SET completedmissions = ? WHERE authid=?";
-//        ArrayList<String> existingCompletedmissions = new ArrayList<>(Arrays.asList(getCompletedmissionsForUser(id)));
-//        for (String task : user.getCompletedmissions()) {
-//            existingCompletedmissions.add(task);
-//        }
-//
-//        String[] updatedMissions = new String[existingCompletedmissions.size()];
-//        updatedMissions = existingCompletedmissions.toArray(updatedMissions);
-//
-//        String[] finalUpdatedMissions = updatedMissions;
-//        PreparedStatementCreator preparedStatementCreator = connection -> {
-//            PreparedStatement preparedStatement = connection
-//                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-//            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedMissions));
-//            preparedStatement.setString(2, id);
-//            return preparedStatement;
-//        };
-//
-//        jdbc.update(preparedStatementCreator, kh);
-//        return kh.getKeys().toString();
-//    }
-
-    @PutMapping("/{id}/contact")
-    public int updateUserContactpersonuserid(@PathVariable String id, @RequestBody User user) {
-        String sql = "UPDATE users SET contactpersonuserid = ? WHERE authid=?";
-        return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
-    }
-
 }
