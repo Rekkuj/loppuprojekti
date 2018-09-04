@@ -15,23 +15,23 @@ public class Group {
     private String groupname;
     private String[] teachers;
     private String[] pupils;
-    private Integer taskscores;
+    private Integer missionscores;
     
     public Group() {
     }
     
-    public Group(Integer groupid, String groupname, String[] teachers, String[] pupils, Integer taskscores) {
+    public Group(Integer groupid, String groupname, String[] teachers, String[] pupils, Integer missionscores) {
         this.groupid = groupid;
         this.groupname = groupname;
         this.teachers = teachers;
         this.pupils = pupils;
-        this.taskscores = taskscores;
+        this.missionscores = missionscores;
     }
     
-    public Group(int groupid, String groupname, int taskscores) {
+    public Group(int groupid, String groupname, int missionscores) {
         this.groupid = groupid;
         this.groupname = groupname;
-        this.taskscores = taskscores;
+        this.missionscores = missionscores;
     }
     
     public Integer getGroupid() {
@@ -66,11 +66,11 @@ public class Group {
         this.pupils = pupils;
     }
     
-    public Integer getTaskscores() {
-        return taskscores;
+    public Integer getMissionscores() {
+        return missionscores;
     }
     
-    public void setTaskscores(Integer taskscores) {
-        this.taskscores = taskscores;
+    public void setMissionscores(Integer missionscores) {
+        this.missionscores = missionscores;
     }
 }

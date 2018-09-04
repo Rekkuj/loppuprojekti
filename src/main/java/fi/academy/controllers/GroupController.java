@@ -218,6 +218,6 @@ public class GroupController {
 //    @PutMapping("/{groupid}/scores")
 //    public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
 //        String sql = "UPDATE groups SET missionscores = ? WHERE groupid=?";
-//        return jdbc.update(sql, new Object[]{group.getTaskscores(), groupid});
+//        return jdbc.update(sql, new Object[]{group.getMissionscores(), groupid});
 //    }
 }

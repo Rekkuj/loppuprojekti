@@ -30,7 +30,7 @@ public class GroupRowMapper implements RowMapper<Group> {
         group.setGroupname(groupRow.getString("groupname"));
         group.setTeachers(ifTeachersNull);
         group.setPupils(ifPupilsNull);
-        group.setTaskscores(groupRow.getInt("missionscores"));
+        group.setMissionscores(groupRow.getInt("missionscores"));
         return group;
     }
 }
