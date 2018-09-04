@@ -20,6 +20,13 @@ public class Group {
     public Group() {
     }
     
+    public Group(String groupname, String[] teachers, String[] pupils, Integer missionscores) {
+        this.groupname = groupname;
+        this.teachers = teachers;
+        this.pupils = pupils;
+        this.missionscores = missionscores;
+    }
+    
     public Group(Integer groupid, String groupname, String[] teachers, String[] pupils, Integer missionscores) {
         this.groupid = groupid;
         this.groupname = groupname;
