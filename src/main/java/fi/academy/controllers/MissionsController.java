@@ -32,7 +32,6 @@ public class MissionsController {
                             rs.getString("componentname")
                     );}
                     );
-        System.out.println("tämä toimii?" + result);
         return result;
     }
 

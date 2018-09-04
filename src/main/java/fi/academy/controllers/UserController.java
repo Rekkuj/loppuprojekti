@@ -71,9 +71,9 @@ public class UserController {
             } else {
                 queryId = null;
             }
-            System.out.println(queryId);
+//            System.out.println(queryId);
             User user = jdbc.queryForObject(sql, userRowMapper, queryId);
-            System.out.println(user);
+//            System.out.println(user);
             return new ResponseEntity<User>(user, HttpStatus.OK);
         } catch (NotAuthorizedException err) {
             throw err;
