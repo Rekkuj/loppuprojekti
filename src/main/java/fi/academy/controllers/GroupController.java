@@ -52,7 +52,7 @@ public class GroupController {
                             rs.getString("groupname"),
                             ifTeachersNull,
                             ifPupilsNull,
-                            rs.getInt("taskscores"));
+                            rs.getInt("missionscores"));
                 });
         return result;
     }
@@ -88,7 +88,7 @@ public class GroupController {
     @PostMapping()
     public String insertGroup(@RequestBody Group group) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO groups (groupname, teachers, pupils, taskscores) values (?, ?, ?, ?)";
+        String sql = "INSERT INTO groups (groupname, teachers, pupils, missionscores) values (?, ?, ?, ?)";
 
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection

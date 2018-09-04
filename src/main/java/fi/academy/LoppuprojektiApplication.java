@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import fi.academy.controllers.UserController;
 
 import java.security.Principal;
 
@@ -22,7 +23,6 @@ public class LoppuprojektiApplication {
 
     @RequestMapping("api/user")
     public Principal user(Principal principal) {
-
         return principal;
     }
 
