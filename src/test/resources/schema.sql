@@ -3,12 +3,12 @@ CREATE TABLE groups (
     groupname varchar NOT NULL,
     teachers array,
     pupils array,
-    taskscores int
+    missionscores int
 );
 CREATE UNIQUE INDEX groups_groupname_uindex ON groups (groupname);
 
 CREATE TABLE users (
-    id int AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    id int AUTO_INCREMENT PRIMARY KEY,
     username varchar NOT NULL,
     role varchar,
     points int,

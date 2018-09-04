@@ -62,7 +62,15 @@ public class UserController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE authid=?";
         try {
-            String queryId = id.equals(principal.getName()) ? id : null;
+            //TODO hae prinsipalilla hlö, tsekkaa onko ope tai sama
+            String subQuery = "SELECT * FROM users where authid=?";
+            User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+            String queryId;
+            if (authenticatedPrincipal.getRole().equals("CHIEF")||id.equals(principal.getName())){
+                queryId = id;
+            } else {
+                queryId = null;
+            }
             System.out.println(queryId);
             User user = jdbc.queryForObject(sql, userRowMapper, queryId);
             System.out.println(user);
@@ -91,8 +99,8 @@ public class UserController {
 //            throw err;
 //        }
 //    }
-    
-    public User getOneUserByUsername(@RequestParam String username) {
+    @GetMapping("/user/{username}")
+    public User getOneUserByUsername(@PathVariable String username) {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String sql = "SELECT * FROM users WHERE username=?";
         return jdbc.queryForObject(sql, userRowMapper, username);
