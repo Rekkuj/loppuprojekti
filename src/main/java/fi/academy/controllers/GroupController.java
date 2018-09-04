@@ -52,7 +52,7 @@ public class GroupController {
                             rs.getString("groupname"),
                             ifTeachersNull,
                             ifPupilsNull,
-                            rs.getInt("taskscores"));
+                            rs.getInt("missionscores"));
                 });
         return result;
     }
@@ -88,7 +88,7 @@ public class GroupController {
     @PostMapping()
     public String insertGroup(@RequestBody Group group) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO groups (groupname, teachers, pupils, taskscores) values (?, ?, ?, ?)";
+        String sql = "INSERT INTO groups (groupname, teachers, pupils, missioncores) values (?, ?, ?, ?)";
 
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
@@ -214,10 +214,10 @@ public class GroupController {
         jdbc.update(preparedStatementCreator, kh);
         return kh.getKeys().toString();
     }
-    
-    @PutMapping("/{groupid}/scores")
-    public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
-        String sql = "UPDATE groups SET missionscores = ? WHERE groupid=?";
-        return jdbc.update(sql, new Object[]{group.getTaskscores(), groupid});
-    }
+    //TODO: tämä jää toistaiseksi tänne
+//    @PutMapping("/{groupid}/scores")
+//    public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
+//        String sql = "UPDATE groups SET missionscores = ? WHERE groupid=?";
+//        return jdbc.update(sql, new Object[]{group.getTaskscores(), groupid});
+//    }
 }
