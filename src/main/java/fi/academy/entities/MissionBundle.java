@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "MISSIONBUNDLES")
 
-public class MissionBundles {
+public class MissionBundle {
     @Id
     @GeneratedValue
     private Integer bundleid;
@@ -16,36 +16,36 @@ public class MissionBundles {
     private Integer[] listofmissions;
     private String bundlename;
 
-    public MissionBundles(Integer bundleid, Integer[] belongstogroups, Integer[] listofmissions, String bundlename) {
+    public MissionBundle(Integer bundleid, Integer[] belongstogroups, Integer[] listofmissions, String bundlename) {
         this.bundleid = bundleid;
         this.belongstogroups = belongstogroups;
         this.listofmissions = listofmissions;
         this.bundlename = bundlename;
     }
 
-    public MissionBundles(Integer bundleid, Integer[] belongstogroups, Integer[] listofmissions) {
+    public MissionBundle(Integer bundleid, Integer[] belongstogroups, Integer[] listofmissions) {
         this.bundleid = bundleid;
         this.belongstogroups = belongstogroups;
         this.listofmissions = listofmissions;
     }
 
-    public MissionBundles(Integer bundleid, Integer[] listofmissions, String bundlename) {
+    public MissionBundle(Integer bundleid, Integer[] listofmissions, String bundlename) {
         this.bundleid = bundleid;
         this.listofmissions = listofmissions;
         this.bundlename = bundlename;
     }
 
-    public MissionBundles(Integer bundleid, String bundlename) {
+    public MissionBundle(Integer bundleid, String bundlename) {
         this.bundleid = bundleid;
         this.bundlename = bundlename;
     }
 
-    public MissionBundles(Integer bundleid, Integer[] listofmissions) {
+    public MissionBundle(Integer bundleid, Integer[] listofmissions) {
         this.bundleid = bundleid;
         this.listofmissions = listofmissions;
     }
 
-    public MissionBundles() {
+    public MissionBundle() {
     }
 
     public Integer getBundleid() {
