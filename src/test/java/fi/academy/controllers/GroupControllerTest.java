@@ -134,10 +134,10 @@ public class GroupControllerTest {
     }
 
     @Test
-    public void updateUsernameTest() throws Exception {
+    public void updateGroupnameTest() throws Exception {
         Group firstGroup = getFirstGroupFromDBTest();
         String url = urlWithPort("/groups" + firstGroup.getGroupname() + "/groupname");
-        String originalGroupname = String.valueOf(groupController.getOneGroupByGroupname(firstGroup.getGroupname()));
+        String originalGroupname = firstGroup.getGroupname();
         String updatedGroupname = originalGroupname + "_updated";
         firstGroup.setGroupname(updatedGroupname);
         RequestEntity<Group> requestEntity = new RequestEntity<>(firstGroup, HttpMethod.PUT, new URI(url));

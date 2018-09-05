@@ -22,7 +22,12 @@ public class MissionBundle {
         this.listofmissions = listofmissions;
         this.bundlename = bundlename;
     }
-
+    
+    public MissionBundle(Integer[] listofmissions, String bundlename) {
+        this.listofmissions = listofmissions;
+        this.bundlename = bundlename;
+    }
+    
     public MissionBundle(Integer bundleid, Integer[] belongstogroups, Integer[] listofmissions) {
         this.bundleid = bundleid;
         this.belongstogroups = belongstogroups;
@@ -47,7 +52,7 @@ public class MissionBundle {
 
     public MissionBundle() {
     }
-
+    
     public Integer getBundleid() {
         return bundleid;
     }
