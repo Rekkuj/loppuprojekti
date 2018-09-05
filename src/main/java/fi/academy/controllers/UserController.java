@@ -241,9 +241,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}/contact")
-    public int updateUserContactpersonuserid(@PathVariable String id, @RequestBody User user) {
-        String sql = "UPDATE users SET contactpersonuserid = ? WHERE authid=?";
-        return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
+    public int updateUserContactpersonuserid(@PathVariable String id, @RequestBody User user, Principal principal) {
+        if (principal.getName() != null) {
+            String sql = "UPDATE users SET contactpersonuserid = ? WHERE authid=?";
+            return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
     }
 
 }

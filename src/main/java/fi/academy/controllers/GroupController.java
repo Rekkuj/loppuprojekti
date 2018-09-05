@@ -69,10 +69,17 @@ public class GroupController {
     }
 
     @GetMapping("/{groupid}")
-    public Group getOneUserById(@PathVariable Integer groupid) {
-        RowMapper<Group> groupRowMapper = new GroupRowMapper();
-        String sql = "SELECT * FROM groups WHERE groupid=?";
-        return jdbc.queryForObject(sql, groupRowMapper, groupid);
+    public Group getOneUserById(@PathVariable Integer groupid, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getGroupid()==groupid) {
+            RowMapper<Group> groupRowMapper = new GroupRowMapper();
+            String sql = "SELECT * FROM groups WHERE groupid=?";
+            return jdbc.queryForObject(sql, groupRowMapper, groupid);
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
     }
 
     @GetMapping("/{groupid}/teachers")
