@@ -134,10 +134,10 @@ public class GroupControllerTest {
     }
 
     @Test
-    public void updateUsernameTest() throws Exception {
+    public void updateGroupnameTest() throws Exception {
         Group firstGroup = getFirstGroupFromDBTest();
         String url = urlWithPort("/groups" + firstGroup.getGroupname() + "/groupname");
-        String originalGroupname = String.valueOf(groupController.getOneGroupByGroupname(firstGroup.getGroupname()));
+        String originalGroupname = firstGroup.getGroupname();
         String updatedGroupname = originalGroupname + "_updated";
         firstGroup.setGroupname(updatedGroupname);
         RequestEntity<Group> requestEntity = new RequestEntity<>(firstGroup, HttpMethod.PUT, new URI(url));
@@ -146,7 +146,10 @@ public class GroupControllerTest {
     }
 
     private Group getFirstGroupFromDBTest() {
-        List<Group> allGroups = groupController.getAllGroups();
+        ResponseEntity<List<Group>> responseEntity = restTemplate.exchange(urlWithPort("/groups"), HttpMethod.GET, null, new ParameterizedTypeReference<List<Group>>() {
+        });
+        List<Group> allGroups = responseEntity.getBody();
+//        List<Group> allGroups = groupController.getAllGroups();
         return allGroups.isEmpty() ? null : allGroups.get(0);
     }
     

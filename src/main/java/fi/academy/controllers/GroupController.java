@@ -6,6 +6,7 @@ import fi.academy.exceptions.NotAuthorizedException;
 import fi.academy.rowmappers.GroupRowMapper;
 import fi.academy.rowmappers.OneStringRowMapper;
 import fi.academy.rowmappers.UserRowMapper;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -73,7 +74,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getGroupid()==groupid) {
+        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("CHIEF")) {
             RowMapper<Group> groupRowMapper = new GroupRowMapper();
             String sql = "SELECT * FROM groups WHERE groupid=?";
             return jdbc.queryForObject(sql, groupRowMapper, groupid);
@@ -83,158 +84,219 @@ public class GroupController {
     }
 
     @GetMapping("/{groupid}/teachers")
-    public String[] getTeachersByGroupId(@PathVariable Integer groupid) {
-        RowMapper<String[]> teachersRowMapper = new OneStringRowMapper("teachers");
-        String sql = "SELECT teachers FROM groups WHERE groupid=?";
-        return jdbc.queryForObject(sql, teachersRowMapper, groupid);
+    public String[] getTeachersByGroupId(@PathVariable Integer groupid, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("CHIEF")) {
+            RowMapper<String[]> teachersRowMapper = new OneStringRowMapper("teachers");
+            String sql = "SELECT teachers FROM groups WHERE groupid=?";
+            return jdbc.queryForObject(sql, teachersRowMapper, groupid);
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
     }
 
     @GetMapping("/{groupid}/pupils")
-    public String[] getPupilsByGroupId(@PathVariable Integer groupid) {
-        RowMapper<String[]> pupilsRowMapper = new OneStringRowMapper("pupils");
-        String sql = "SELECT pupils FROM groups WHERE groupid=?";
-        return jdbc.queryForObject(sql, pupilsRowMapper, groupid);
+    public String[] getPupilsByGroupId(@PathVariable Integer groupid, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("CHIEF")) {
+            RowMapper<String[]> pupilsRowMapper = new OneStringRowMapper("pupils");
+            String sql = "SELECT pupils FROM groups WHERE groupid=?";
+            return jdbc.queryForObject(sql, pupilsRowMapper, groupid);
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
     }
 
     @GetMapping("/{groupname}/groupname")
-    public Group getOneGroupByGroupname(@PathVariable String groupname) {
+    public Group getOneGroupByGroupname(@PathVariable String groupname, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
         RowMapper<Group> groupRowMapper = new GroupRowMapper();
         String sql = "SELECT * FROM groups WHERE groupname=?";
-        return jdbc.queryForObject(sql, groupRowMapper, groupname);
+        Group group = jdbc.queryForObject(sql, groupRowMapper, groupname);
+        if (authenticatedPrincipal.getGroupid() == group.getGroupid() || authenticatedPrincipal.getRole().equals("CHIEF")) {
+            return group;
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
     }
 
     @PostMapping()
-    public Group insertGroup(@RequestBody Group group) {
-        KeyHolder kh = new GeneratedKeyHolder();
+    public Group insertGroup(@RequestBody Group group, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+            KeyHolder kh = new GeneratedKeyHolder();
 
-        String sql = "INSERT INTO groups (groupid, groupname, teachers, pupils, missionscores) values (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO groups (groupid, groupname, teachers, pupils, missionscores) values (?, ?, ?, ?, ?)";
 
-        PreparedStatementCreator preparedStatementCreator = connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1, group.getGroupid());
-            preparedStatement.setString(2, group.getGroupname());
-            preparedStatement.setArray(3, connection.createArrayOf("text", group.getTeachers()));
-            preparedStatement.setArray(4, connection.createArrayOf("text", group.getPupils()));
-            preparedStatement.setInt(5, 0);
-            return preparedStatement;
-        };
+            PreparedStatementCreator preparedStatementCreator = connection -> {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setInt(1, group.getGroupid());
+                preparedStatement.setString(2, group.getGroupname());
+                preparedStatement.setArray(3, connection.createArrayOf("text", group.getTeachers()));
+                preparedStatement.setArray(4, connection.createArrayOf("text", group.getPupils()));
+                preparedStatement.setInt(5, 0);
+                return preparedStatement;
+            };
 
-        jdbc.update(preparedStatementCreator, kh);
-        Integer generatedId = (Integer)kh.getKeys().get("groupid");
-        group.setGroupid(generatedId);
-        return group;
+            jdbc.update(preparedStatementCreator, kh);
+            Integer generatedId = (Integer) kh.getKeys().get("groupid");
+            group.setGroupid(generatedId);
+            return group;
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
     }
 
     @PutMapping("/{groupid}/teachers")
-    public String updateGroupTeachers(@PathVariable Integer groupid, @RequestBody Group group) {
-        KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
+    public String updateGroupTeachers(@PathVariable Integer groupid, @RequestBody Group group, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
 
-        ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid)));
-        for (String teacher : group.getTeachers()) {
-            existingTeachers.add(teacher);
+            KeyHolder kh = new GeneratedKeyHolder();
+            String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
+
+            ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid,principal)));
+            for (String teacher : group.getTeachers()) {
+                existingTeachers.add(teacher);
+            }
+
+            String[] updatedTeachers = new String[existingTeachers.size()];
+            updatedTeachers = existingTeachers.toArray(updatedTeachers);
+
+            String[] finalUpdatedTeachers = updatedTeachers;
+            PreparedStatementCreator preparedStatementCreator = connection -> {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTeachers));
+                preparedStatement.setInt(2, groupid);
+                return preparedStatement;
+            };
+
+            jdbc.update(preparedStatementCreator, kh);
+            return kh.getKeys().toString();
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
-
-        String[] updatedTeachers = new String[existingTeachers.size()];
-        updatedTeachers = existingTeachers.toArray(updatedTeachers);
-
-        String[] finalUpdatedTeachers = updatedTeachers;
-        PreparedStatementCreator preparedStatementCreator = connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTeachers));
-            preparedStatement.setInt(2, groupid);
-            return preparedStatement;
-        };
-
-        jdbc.update(preparedStatementCreator, kh);
-        return kh.getKeys().toString();
     }
 
     @PutMapping("/{groupid}/teachertodelete")
-    public String deleteOneTeacherFromGroupTeachers(@PathVariable Integer groupid, @RequestBody String teacherToDelete) {
-        KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
+    public String deleteOneTeacherFromGroupTeachers(@PathVariable Integer groupid, @RequestBody String teacherToDelete,Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
 
-        ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid)));
+            KeyHolder kh = new GeneratedKeyHolder();
+            String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
 
-        for (String teacher : existingTeachers) {
-            if (teacher.equals(teacherToDelete)) {
-                existingTeachers.remove(teacher);
-                break;
+            ArrayList<String> existingTeachers = new ArrayList<>(Arrays.asList(getTeachersByGroupId(groupid, principal)));
+
+            for (String teacher : existingTeachers) {
+                if (teacher.equals(teacherToDelete)) {
+                    existingTeachers.remove(teacher);
+                    break;
+                }
             }
+
+            String[] updatedTeachers = new String[existingTeachers.size()];
+            updatedTeachers = existingTeachers.toArray(updatedTeachers);
+
+            String[] finalUpdatedTeachers = updatedTeachers;
+            PreparedStatementCreator preparedStatementCreator = connection -> {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTeachers));
+                preparedStatement.setInt(2, groupid);
+                return preparedStatement;
+            };
+
+            jdbc.update(preparedStatementCreator, kh);
+            return kh.getKeys().toString();
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
-
-        String[] updatedTeachers = new String[existingTeachers.size()];
-        updatedTeachers = existingTeachers.toArray(updatedTeachers);
-
-        String[] finalUpdatedTeachers = updatedTeachers;
-        PreparedStatementCreator preparedStatementCreator = connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedTeachers));
-            preparedStatement.setInt(2, groupid);
-            return preparedStatement;
-        };
-
-        jdbc.update(preparedStatementCreator, kh);
-        return kh.getKeys().toString();
     }
 
     @PutMapping("/{groupid}/pupils")
-    public String updateGroupPupils(@PathVariable Integer groupid, @RequestBody Group group) {
-        KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
+    public String updateGroupPupils(@PathVariable Integer groupid, @RequestBody Group group, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
 
-        ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid)));
-        for (String pupil : group.getPupils()) {
-            existingPupils.add(pupil);
+            KeyHolder kh = new GeneratedKeyHolder();
+            String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
+
+            ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid,principal)));
+            for (String pupil : group.getPupils()) {
+                existingPupils.add(pupil);
+            }
+
+            String[] updatedPupils = new String[existingPupils.size()];
+            updatedPupils = existingPupils.toArray(updatedPupils);
+
+            String[] finalUpdatedPupils = updatedPupils;
+            PreparedStatementCreator preparedStatementCreator = connection -> {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedPupils));
+                preparedStatement.setInt(2, groupid);
+                return preparedStatement;
+            };
+
+            jdbc.update(preparedStatementCreator, kh);
+            return kh.getKeys().toString();
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
-
-        String[] updatedPupils = new String[existingPupils.size()];
-        updatedPupils = existingPupils.toArray(updatedPupils);
-
-        String[] finalUpdatedPupils = updatedPupils;
-        PreparedStatementCreator preparedStatementCreator = connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedPupils));
-            preparedStatement.setInt(2, groupid);
-            return preparedStatement;
-        };
-
-        jdbc.update(preparedStatementCreator, kh);
-        return kh.getKeys().toString();
     }
 
     @PutMapping("/{groupid}/pupiltodelete")
-    public String deleteOnePupilFromGroupPupils(@PathVariable Integer groupid, @RequestBody String pupilToDelete) {
-        KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
+    public String deleteOnePupilFromGroupPupils(@PathVariable Integer groupid, @RequestBody String pupilToDelete,Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
 
-        ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid)));
-        for (String pupil : existingPupils) {
-            if (pupil.equals(pupilToDelete)) {
-                existingPupils.remove(pupil);
-                break;
+            KeyHolder kh = new GeneratedKeyHolder();
+            String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
+
+            ArrayList<String> existingPupils = new ArrayList<>(Arrays.asList(getPupilsByGroupId(groupid,principal)));
+            for (String pupil : existingPupils) {
+                if (pupil.equals(pupilToDelete)) {
+                    existingPupils.remove(pupil);
+                    break;
+                }
             }
+
+            String[] updatedPupils = new String[existingPupils.size()];
+            updatedPupils = existingPupils.toArray(updatedPupils);
+
+            String[] finalUpdatedPupils = updatedPupils;
+            PreparedStatementCreator preparedStatementCreator = connection -> {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedPupils));
+                preparedStatement.setInt(2, groupid);
+                return preparedStatement;
+            };
+
+            jdbc.update(preparedStatementCreator, kh);
+            return kh.getKeys().toString();
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
-
-        String[] updatedPupils = new String[existingPupils.size()];
-        updatedPupils = existingPupils.toArray(updatedPupils);
-
-        String[] finalUpdatedPupils = updatedPupils;
-        PreparedStatementCreator preparedStatementCreator = connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedPupils));
-            preparedStatement.setInt(2, groupid);
-            return preparedStatement;
-        };
-
-        jdbc.update(preparedStatementCreator, kh);
-        return kh.getKeys().toString();
     }
     //TODO: tämä jää toistaiseksi tänne
 //    @PutMapping("/{groupid}/scores")
