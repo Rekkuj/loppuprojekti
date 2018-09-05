@@ -70,7 +70,7 @@ public class UserControllerTest {
         response = this.restTemplate.getForObject("/users", String.class);
         ResponseEntity<String> responseEntity = restTemplate.exchange(urlWithPort("/users"), HttpMethod.GET, entity, String.class);
         actual = responseEntity.getBody().toString();
-        assertTrue(actual.contains("{\"id\":1,\"username\":\"Jermu\",\"role\":\"CHIEF\",\"points\":2000,\"groupid\":1,\"completedmissions\":[\"Himmeli\",\"Helpperi\"],\"contactpersonuserid\":1,\"authid\":\"auth0|5b87943afe13090f5ffd652b\"}"));
+        assertTrue(actual.contains("{\"id\":1,\"username\":\"Jermu\",\"role\":\"Teacher\",\"points\":2000,\"groupid\":1,\"completedmissions\":[\"Himmeli\",\"Helpperi\"],\"contactpersonuserid\":1,\"authid\":\"auth0|5b87943afe13090f5ffd652b\"}"));
     }
 
     /*Check that context loads and responsebody contains user "Jermu"*/

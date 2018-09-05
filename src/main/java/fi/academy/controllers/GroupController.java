@@ -37,7 +37,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
             List<Group> result = jdbc.query("select * from groups",
                     (ResultSet rs, int index) -> {
                         String[] ifTeachersNull;
@@ -74,7 +74,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("Teacher")) {
             RowMapper<Group> groupRowMapper = new GroupRowMapper();
             String sql = "SELECT * FROM groups WHERE groupid=?";
             return jdbc.queryForObject(sql, groupRowMapper, groupid);
@@ -88,7 +88,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("Teacher")) {
             RowMapper<String[]> teachersRowMapper = new OneStringRowMapper("teachers");
             String sql = "SELECT teachers FROM groups WHERE groupid=?";
             return jdbc.queryForObject(sql, teachersRowMapper, groupid);
@@ -102,7 +102,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getGroupid() == groupid || authenticatedPrincipal.getRole().equals("Teacher")) {
             RowMapper<String[]> pupilsRowMapper = new OneStringRowMapper("pupils");
             String sql = "SELECT pupils FROM groups WHERE groupid=?";
             return jdbc.queryForObject(sql, pupilsRowMapper, groupid);
@@ -119,7 +119,7 @@ public class GroupController {
         RowMapper<Group> groupRowMapper = new GroupRowMapper();
         String sql = "SELECT * FROM groups WHERE groupname=?";
         Group group = jdbc.queryForObject(sql, groupRowMapper, groupname);
-        if (authenticatedPrincipal.getGroupid() == group.getGroupid() || authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getGroupid() == group.getGroupid() || authenticatedPrincipal.getRole().equals("Teacher")) {
             return group;
         } else {
             throw new NotAuthorizedException("Not authorized");
@@ -131,7 +131,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
             KeyHolder kh = new GeneratedKeyHolder();
 
             String sql = "INSERT INTO groups (groupid, groupname, teachers, pupils, missionscores) values (?, ?, ?, ?, ?)";
@@ -161,7 +161,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
 
             KeyHolder kh = new GeneratedKeyHolder();
             String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
@@ -195,7 +195,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
 
             KeyHolder kh = new GeneratedKeyHolder();
             String sql = "UPDATE groups SET teachers = ? WHERE groupid=?";
@@ -233,7 +233,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
 
             KeyHolder kh = new GeneratedKeyHolder();
             String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";
@@ -267,7 +267,7 @@ public class GroupController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
 
             KeyHolder kh = new GeneratedKeyHolder();
             String sql = "UPDATE groups SET pupils = ? WHERE groupid=?";

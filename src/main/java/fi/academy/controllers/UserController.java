@@ -40,7 +40,7 @@ public class UserController {
             //TODO hae prinsipalilla hlö, tsekkaa onko ope tai sama
             String subQuery = "SELECT * FROM users where authid=?";
             User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-            if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+            if (authenticatedPrincipal.getRole().equals("Teacher")) {
                 List<User> result = jdbc.query("select * from users",
                         (ResultSet rs, int index) -> {
                             String[] ifCompletedmissionsNull;
@@ -78,7 +78,7 @@ public class UserController {
             String subQuery = "SELECT * FROM users where authid=?";
             User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
             String queryId;
-            if (authenticatedPrincipal.getRole().equals("CHIEF") || id.equals(principal.getName())) {
+            if (authenticatedPrincipal.getRole().equals("Teacher") || id.equals(principal.getName())) {
                 queryId = id;
             } else {
                 queryId = null;
@@ -119,7 +119,7 @@ public class UserController {
         //TODO hae prinsipalilla hlö, tsekkaa onko ope tai sama
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
             return jdbc.queryForObject(sql, userRowMapper, username);
         } else {
             throw new NotAuthorizedException("Not authorized");
@@ -133,7 +133,7 @@ public class UserController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF") || id.equals(principal.getName())) {
+        if (authenticatedPrincipal.getRole().equals("Teacher") || id.equals(principal.getName())) {
             return jdbc.queryForObject(sql, completedMissionsRowMapper, id);
         } else {
             throw new NotAuthorizedException("Not authorized");
@@ -147,7 +147,7 @@ public class UserController {
         RowMapper<User> userRowMapper = new UserRowMapper();
         String subQuery = "SELECT * FROM users where authid=?";
         User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
             PreparedStatementCreator preparedStatementCreator = connection -> {
                 PreparedStatement preparedStatement = connection
                         .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
