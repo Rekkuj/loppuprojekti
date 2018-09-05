@@ -20,3 +20,11 @@ CREATE TABLE users (
 	  CONSTRAINT USERS_USERS_ID_fk FOREIGN KEY (CONTACTPERSONUSERID) REFERENCES USERS (ID)
 );
 CREATE UNIQUE INDEX users_username_uindex ON users (username);
+
+CREATE TABLE missionbundles (
+    bundleid int AUTO_INCREMENT PRIMARY KEY,
+    belongstogroups array,
+    listofmissions array,
+    bundlename varchar
+);
+CREATE UNIQUE INDEX missionbundles_bundlename_uindex ON missionbundles (bundlename);

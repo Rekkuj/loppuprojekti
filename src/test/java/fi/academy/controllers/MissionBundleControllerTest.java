@@ -1,10 +1,7 @@
 package fi.academy.controllers;
 
 import fi.academy.LoppuprojektiApplication;
-import fi.academy.entities.AccessToken;
-import fi.academy.entities.AuthenticationQuery;
-import fi.academy.entities.HeaderRequestInterceptor;
-import fi.academy.entities.User;
+import fi.academy.entities.*;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -67,8 +64,8 @@ public class MissionBundleControllerTest {
     public void getJermuUser(){
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
         
-        response = this.restTemplate.getForObject("/users", String.class);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(urlWithPort("/users"), HttpMethod.GET, entity, String.class);
+        response = this.restTemplate.getForObject("/missionbundles", String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(urlWithPort("/missionbundles"), HttpMethod.GET, entity, String.class);
         actual = responseEntity.getBody().toString();
         assertTrue(actual.contains("{\"id\":1,\"username\":\"Jermu\",\"role\":\"CHIEF\",\"points\":2000,\"groupid\":1,\"completedmissions\":[\"Himmeli\",\"Helpperi\"],\"contactpersonuserid\":1,\"authid\":\"auth0|5b87943afe13090f5ffd652b\"}"));
     }
@@ -76,7 +73,7 @@ public class MissionBundleControllerTest {
     /*Check that context loads and responsebody contains user "Jermu"*/
     @Test
     public void getAllUsersTest(){
-        ResponseEntity<List<User>> responseEntity = restTemplate.exchange(urlWithPort("/users"), HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
+        ResponseEntity<List<User>> responseEntity = restTemplate.exchange(urlWithPort("/missionbundles"), HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
         });
         List<User> user = responseEntity.getBody();
 //        Integer lkm = jdbc.queryForObject("select count(*) from users", Integer.class);
@@ -87,7 +84,7 @@ public class MissionBundleControllerTest {
     /* Call GET by username */
     @Test
     public void getOneUserByUsernameTest() throws JSONException {
-        response = this.restTemplate.getForObject("/users/user/Rekku", String.class);
+        response = this.restTemplate.getForObject("/missionbundles/user/Rekku", String.class);
         JSONAssert.assertEquals("{\n" +
                 "    \"username\": \"Rekku\",\n" +
                 "    \"role\": \"Testaaja\",\n" +
@@ -101,7 +98,7 @@ public class MissionBundleControllerTest {
     /* Call GET by id */
     @Test
     public void getOneUserByIdTest() throws JSONException {
-        response = this.restTemplate.getForObject("/users/4", String.class);
+        response = this.restTemplate.getForObject("/missionbundles/4", String.class);
         JSONAssert.assertEquals("{\n" +
                 "    \"username\": \"Rekku\",\n" +
                 "    \"role\": \"Testaaja\",\n" +
@@ -115,7 +112,7 @@ public class MissionBundleControllerTest {
     /* Check if Jermu user's completedtasks equals Himmeli and Helpperi */
     @Test
     public void getCompletedTasksForUserTest() throws JSONException {
-        response = this.restTemplate.getForObject("/users/auth0|5b87943afe13090f5ffd652b/completedmissions", String.class);
+        response = this.restTemplate.getForObject("/missionbundles/auth0|5b87943afe13090f5ffd652b/completedmissions", String.class);
         JSONAssert.assertEquals("[\"Himmeli\", \"Helpperi\"]", response, false);
     }
     
@@ -125,33 +122,33 @@ public class MissionBundleControllerTest {
         User user = new User("Kettu", "Kekkuloija", 500, 1, null, 3, "Elsa1");
         
         ResponseEntity<User> responseEntity = restTemplate.postForEntity(
-                urlWithPort("/users"), user, User.class);
+                urlWithPort("/missionbundles"), user, User.class);
         assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
         System.out.println(responseEntity.getBody());
         
         /* Check location for creating testLocation*/
-        String testLocation = "/users/" + responseEntity.getBody().getAuthid();
+        String testLocation = "/missionbundles/" + responseEntity.getBody().getAuthid();
         responseEntity = restTemplate.getForEntity(testLocation, User.class);
         assertThat(responseEntity.getStatusCodeValue(), is(200));
         User insertedUser = responseEntity.getBody();
         assertTrue(insertedUser.getUsername().equals(user.getUsername()));
     }
     
-    @Test
-    public void updateUsernameTest() throws Exception {
-        User firstUser = getFirstUserFromDBTest();
-        String url = urlWithPort("/users" + firstUser.getUsername() + "/username");
-        String originalUsername = String.valueOf(userController.getOneUserByUsername(firstUser.getUsername()));
-        String updatedUsername = originalUsername + "_updated";
-        firstUser.setUsername(updatedUsername);
-        RequestEntity<User> requestEntity = new RequestEntity<>(firstUser, HttpMethod.PUT, new URI(url));
-        ResponseEntity<User> responseEntity = restTemplate.exchange(requestEntity, User.class);
-        assertEquals(updatedUsername, firstUser.getUsername());
-    }
+//    @Test
+//    public void updateMissionBundleNameTest() throws Exception {
+//        MissionBundle firstMissionBundle = getFirstMissionBundleFromDBTest();
+//        String url = urlWithPort("/missionbundles" + firstMissionBundle.getBundleid() + "/bundlename");
+//        Integer originalUsername = (Integer) Integer.valueOf(missionBundleController.getOneMissionBundleById(firstMissionBundle.getBundleid()));
+//        String updatedUsername = originalUsername + "_updated";
+//        firstMissionBundle.setUsername(updatedUsername);
+//        RequestEntity<User> requestEntity = new RequestEntity<>(firstMissionBundle, HttpMethod.PUT, new URI(url));
+//        ResponseEntity<User> responseEntity = restTemplate.exchange(requestEntity, User.class);
+//        assertEquals(updatedUsername, firstMissionBundle.getUsername());
+//    }
 
-    private User getFirstUserFromDBTest() {
-        List<User> allUsers = userController.getAllUsers();
-        return allUsers.isEmpty() ? null : allUsers.get(0);
+    private MissionBundle getFirstMissionBundleFromDBTest() {
+        List<MissionBundle> allMissionBundles = missionBundleController.getAllMissionBundles();
+        return allMissionBundles.isEmpty() ? null : allMissionBundles.get(0);
     }
     
     @BeforeClass
