@@ -63,7 +63,7 @@ public class MissionBundleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOneMissionBundleById(@PathVariable Integer id, Principal principal) {
+    public ResponseEntity<?> getOneMissionBundleById(@PathVariable Integer id) {
         RowMapper<MissionBundle> missionBundleRowMapper = new MissionBundleRowMapper();
         String sql = "SELECT * FROM missionbundles WHERE bundleid=?";
         try {

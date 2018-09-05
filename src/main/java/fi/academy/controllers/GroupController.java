@@ -104,22 +104,26 @@ public class GroupController {
     }
 
     @PostMapping()
-    public String insertGroup(@RequestBody Group group) {
+    public Group insertGroup(@RequestBody Group group) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO groups (groupname, teachers, pupils, missionscores) values (?, ?, ?, ?)";
+
+        String sql = "INSERT INTO groups (groupid, groupname, teachers, pupils, missionscores) values (?, ?, ?, ?, ?)";
 
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, group.getGroupname());
-            preparedStatement.setArray(2, connection.createArrayOf("text", group.getTeachers()));
-            preparedStatement.setArray(3, connection.createArrayOf("text", group.getPupils()));
-            preparedStatement.setInt(4, 0);
+            preparedStatement.setInt(1, group.getGroupid());
+            preparedStatement.setString(2, group.getGroupname());
+            preparedStatement.setArray(3, connection.createArrayOf("text", group.getTeachers()));
+            preparedStatement.setArray(4, connection.createArrayOf("text", group.getPupils()));
+            preparedStatement.setInt(5, 0);
             return preparedStatement;
         };
 
         jdbc.update(preparedStatementCreator, kh);
-        return kh.getKeys().toString();
+        Integer generatedId = (Integer)kh.getKeys().get("groupid");
+        group.setGroupid(generatedId);
+        return group;
     }
 
     @PutMapping("/{groupid}/teachers")
@@ -236,6 +240,6 @@ public class GroupController {
 //    @PutMapping("/{groupid}/scores")
 //    public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
 //        String sql = "UPDATE groups SET missionscores = ? WHERE groupid=?";
-//        return jdbc.update(sql, new Object[]{group.getTaskscores(), groupid});
+//        return jdbc.update(sql, new Object[]{group.getMissionscores(), groupid});
 //    }
 }
