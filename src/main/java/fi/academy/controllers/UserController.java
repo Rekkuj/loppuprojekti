@@ -64,39 +64,37 @@ public class UserController {
                 return result;
             } else {
                 throw new NotAuthorizedException("Not authorized");
-
             }
-
-        } catch(NullPointerException e){
+        } catch (NullPointerException e) {
             throw new NullPointerException();
-        }}
-
-        @GetMapping("/{id}")
-        public ResponseEntity<?> getOneUserById (@PathVariable String id, Principal principal){
-            RowMapper<User> userRowMapper = new UserRowMapper();
-            String sql = "SELECT * FROM users WHERE authid=?";
-            try {
-                //TODO hae prinsipalilla hlö, tsekkaa onko ope tai sama
-                String subQuery = "SELECT * FROM users where authid=?";
-                User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
-                String queryId;
-                if (authenticatedPrincipal.getRole().equals("CHIEF") || id.equals(principal.getName())) {
-                    queryId = id;
-                } else {
-                    queryId = null;
-                }
-                System.out.println(queryId);
-                User user = jdbc.queryForObject(sql, userRowMapper, queryId);
-                System.out.println(user);
-                return new ResponseEntity<User>(user, HttpStatus.OK);
-            } catch (NotAuthorizedException err) {
-                throw err;
-            } catch (EmptyResultDataAccessException dataAccessException) {
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body("User not found with id: " + id);
-            }
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOneUserById(@PathVariable String id, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String sql = "SELECT * FROM users WHERE authid=?";
+        try {
+            String subQuery = "SELECT * FROM users where authid=?";
+            User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+            String queryId;
+            if (authenticatedPrincipal.getRole().equals("CHIEF") || id.equals(principal.getName())) {
+                queryId = id;
+            } else {
+                queryId = null;
+            }
+            System.out.println(queryId);
+            User user = jdbc.queryForObject(sql, userRowMapper, queryId);
+            System.out.println(user);
+            return new ResponseEntity<User>(user, HttpStatus.OK);
+        } catch (NotAuthorizedException err) {
+            return ResponseEntity.status(403).body("Not authorized");
+        } catch (EmptyResultDataAccessException dataAccessException) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User not found with id: " + id);
+        }
+    }
 
 //    @GetMapping("/{id}/id")
 //    public User getOneUserById(@PathVariable String id, Principal principal) {
@@ -114,25 +112,42 @@ public class UserController {
 //        }
 //    }
 
-        public User getOneUserByUsername (@RequestParam String username){
-            RowMapper<User> userRowMapper = new UserRowMapper();
-            String sql = "SELECT * FROM users WHERE username=?";
+    @GetMapping("/user/{username}")
+    public User getOneUserByUsername(@PathVariable String username, Principal principal) {
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String sql = "SELECT * FROM users WHERE username=?";
+        //TODO hae prinsipalilla hlö, tsekkaa onko ope tai sama
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
             return jdbc.queryForObject(sql, userRowMapper, username);
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
-        //TODO ope ja itsensä
-        @GetMapping("/{id}/completedmissions")
-        public String[] getCompletedmissionsForUser (@PathVariable String id){
-            RowMapper<String[]> completedMissionsRowMapper = new OneStringRowMapper("completedmissions");
-            String sql = "SELECT completedmissions FROM users WHERE authid=?";
+    }
+
+    @GetMapping("/{id}/completedmissions")
+    public String[] getCompletedmissionsForUser(@PathVariable String id, Principal principal) {
+        RowMapper<String[]> completedMissionsRowMapper = new OneStringRowMapper("completedmissions");
+        String sql = "SELECT completedmissions FROM users WHERE authid=?";
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF") || id.equals(principal.getName())) {
             return jdbc.queryForObject(sql, completedMissionsRowMapper, id);
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
+    }
 
-        //TODO ope
-        @PostMapping()
-        public User insertUser (@RequestBody User user){
-            KeyHolder kh = new GeneratedKeyHolder();
-            String sql = "INSERT INTO users (username, role, points, groupid, completedmissions, contactpersonuserid, authid) values (?, ?, ?, ?, ?, ?,?)";
-
+    @PostMapping()
+    public User insertUser(@RequestBody User user, Principal principal) {
+        KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "INSERT INTO users (username, role, points, groupid, completedmissions, contactpersonuserid, authid) values (?, ?, ?, ?, ?, ?,?)";
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("CHIEF")) {
             PreparedStatementCreator preparedStatementCreator = connection -> {
                 PreparedStatement preparedStatement = connection
                         .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -150,62 +165,85 @@ public class UserController {
             Integer generatedId = (Integer) kh.getKeys().get("id");
             user.setId(generatedId);
             return user;
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
+    }
 
 
-        @PutMapping("/{id}/username")
-        public int updateUsername (@PathVariable Integer id, @RequestBody User user){
+    @PutMapping("/{id}/username")
+    public int updateUsername(@PathVariable Integer id, @RequestBody User user, Principal principal) {
+        if (principal.getName() != null) {
             String sql = "UPDATE users SET username = ? WHERE id=?";
             return jdbc.update(sql, new Object[]{user.getUsername(), id});
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
+    }
 
-        @PutMapping("/{id}/role")
-        public int updateUserRole (@PathVariable Integer id, @RequestBody User user){
+    @PutMapping("/{id}/role")
+    public int updateUserRole(@PathVariable Integer id, @RequestBody User user, Principal principal) {
+        if (principal.getName() != null) {
             String sql = "UPDATE users SET role = ? WHERE id=?";
             return jdbc.update(sql, new Object[]{user.getRole(), id});
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
+    }
 
-        @PutMapping("/{id}/points")
-        public int updateUserPoints (@PathVariable String id, @RequestBody User user){
+    @PutMapping("/{id}/points")
+    public int updateUserPoints(@PathVariable String id, @RequestBody User user, Principal principal) {
+        if (principal.getName() != null) {
             String sql = "UPDATE users SET points = ? WHERE authid=?";
             return jdbc.update(sql, new Object[]{user.getPoints(), id});
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
+    }
 
-        @PutMapping("/{id}/groupid")
-        public int updateUserGroupid (@PathVariable String id, @RequestBody User user){
+    @PutMapping("/{id}/groupid")
+    public int updateUserGroupid(@PathVariable String id, @RequestBody User user, Principal principal) {
+        if (principal.getName() != null) {
             String sql = "UPDATE users SET groupid = ? WHERE authid=?";
             return jdbc.update(sql, new Object[]{user.getGroupid(), id});
+        } else {
+            throw new NotAuthorizedException("Not authorized");
         }
-
-        @PutMapping("/{id}/completed")
-        public String updateUserCompletedmissions (@PathVariable String id, @RequestBody User user){
-            KeyHolder kh = new GeneratedKeyHolder();
-            String sql = "UPDATE users SET completedmissions = ? WHERE authid=?";
-            ArrayList<String> existingCompletedmissions = new ArrayList<>(Arrays.asList(getCompletedmissionsForUser(id)));
-            for (String task : user.getCompletedmissions()) {
-                existingCompletedmissions.add(task);
-            }
-
-            String[] updatedMissions = new String[existingCompletedmissions.size()];
-            updatedMissions = existingCompletedmissions.toArray(updatedMissions);
-
-            String[] finalUpdatedMissions = updatedMissions;
-            PreparedStatementCreator preparedStatementCreator = connection -> {
-                PreparedStatement preparedStatement = connection
-                        .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedMissions));
-                preparedStatement.setString(2, id);
-                return preparedStatement;
-            };
-
-            jdbc.update(preparedStatementCreator, kh);
-            return kh.getKeys().toString();
-        }
-
-        @PutMapping("/{id}/contact")
-        public int updateUserContactpersonuserid (@PathVariable String id, @RequestBody User user){
-            String sql = "UPDATE users SET contactpersonuserid = ? WHERE authid=?";
-            return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
-        }
-
     }
+
+    @PutMapping("/{id}/completed")
+    public String updateUserCompletedmissions(@PathVariable String id, @RequestBody User user, Principal principal) {
+        if (principal.getName() != null) {
+            KeyHolder kh = new GeneratedKeyHolder();
+        String sql = "UPDATE users SET completedmissions = ? WHERE authid=?";
+        ArrayList<String> existingCompletedmissions = new ArrayList<>(Arrays.asList(getCompletedmissionsForUser(id, principal)));
+        for (String task : user.getCompletedmissions()) {
+            existingCompletedmissions.add(task);
+        }
+
+        String[] updatedMissions = new String[existingCompletedmissions.size()];
+        updatedMissions = existingCompletedmissions.toArray(updatedMissions);
+
+        String[] finalUpdatedMissions = updatedMissions;
+        PreparedStatementCreator preparedStatementCreator = connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setArray(1, connection.createArrayOf("text", finalUpdatedMissions));
+            preparedStatement.setString(2, id);
+            return preparedStatement;
+        };
+
+        jdbc.update(preparedStatementCreator, kh);
+        return kh.getKeys().toString();
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
+    }
+
+    @PutMapping("/{id}/contact")
+    public int updateUserContactpersonuserid(@PathVariable String id, @RequestBody User user) {
+        String sql = "UPDATE users SET contactpersonuserid = ? WHERE authid=?";
+        return jdbc.update(sql, new Object[]{user.getContactpersonuserid(), id});
+    }
+
+}

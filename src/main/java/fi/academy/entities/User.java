@@ -41,7 +41,7 @@ public class User {
     public User() {
     }
     
-    public User(String username, String role, Integer points, Integer groupid, String[] completedmissions, Integer contactpersonuserid) {
+    public User(String username, String role, Integer points, Integer groupid, String[] completedmissions, Integer contactpersonuserid, String authid) {
         this.username = username;
         this.role = role;
         this.points = points;
@@ -67,14 +67,14 @@ public class User {
         this.groupid = groupid;
     }
     
-    public User(int id, String username, String role, int points, int groupid, String[] completedmissions, int contactpersonuserid) {
-        this.id = id;
+    public User(String username, String role, int points, int groupid, String[] completedmissions, int contactpersonuserid, String authid) {
         this.username = username;
         this.role = role;
         this.points = points;
         this.groupid = groupid;
         this.completedmissions = completedmissions ==null ? new String[0] : completedmissions;
         this.contactpersonuserid = contactpersonuserid;
+        this.authid = authid;
     }
     
     public User(String username, String role, int points, int groupid, int contactpersonuserid) {
@@ -84,6 +84,7 @@ public class User {
         this.groupid = groupid;
         this.contactpersonuserid = contactpersonuserid;
     }
+    
     
     public Integer getId() {
         return id;

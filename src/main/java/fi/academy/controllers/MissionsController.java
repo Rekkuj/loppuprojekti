@@ -28,11 +28,10 @@ public class MissionsController {
                 (ResultSet rs, int index) -> {
                     return new Missions(
                             rs.getInt("id"),
-                            rs.getString("taskname"),
+                            rs.getString("missionname"),
                             rs.getString("componentname")
                     );}
                     );
-        System.out.println("tämä toimii?" + result);
         return result;
     }
 
@@ -40,7 +39,7 @@ public class MissionsController {
     @PostMapping()
     public String insertMission (@RequestBody Missions missions) {
         KeyHolder kh = new GeneratedKeyHolder();
-        String sql = "INSERT INTO missions (taskname, componentname) values (?,?)";
+        String sql = "INSERT INTO missions (missionname, componentname) values (?,?)";
         PreparedStatementCreator preparedStatementCreator = connection -> {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
