@@ -85,6 +85,40 @@ public class MissionBundleController {
         return jdbc.queryForObject(sql, belongsToGroupsRowMapper, id);
     }
 
+//    @GetMapping("/group/{groupid}")
+//    public MissionBundle[] getGroupsBundles(@PathVariable Integer groupid) {
+//        RowMapper<MissionBundle[]> belongsToGroupsRowMapper = new MissionBundleRowMapper();
+//        String sql = "SELECT * FROM missionbundles WHERE ?=ANY(belongstogroups)";
+//        return jdbc.queryForObject(sql, belongsToGroupsRowMapper, groupid);
+//    }
+
+    @GetMapping("/group/{groupid}")
+    public List<MissionBundle> getGroupsBundles(@PathVariable Integer groupid){
+        List<MissionBundle> result = jdbc.query("select * from missionbundles where " + groupid + "=ANY(belongstogroups)",
+                (ResultSet rs, int index) -> {
+                    Integer[] ifListOfBelongsToGroupsNull;
+                    if (rs.getArray("belongstogroups")==null) {
+                        ifListOfBelongsToGroupsNull = new Integer[0];
+                    } else {
+                        Object[] obj = (Object[]) rs.getArray("belongstogroups").getArray();
+                        ifListOfBelongsToGroupsNull = Arrays.asList(obj).toArray(new Integer[0]);
+                    }
+                    Integer[] ifListOfMissionsNull;
+                    if (rs.getArray("listofmissions")==null) {
+                        ifListOfMissionsNull = new Integer[0];
+                    } else {
+                        Object[] obj = (Object[])rs.getArray("listofmissions").getArray();
+                        ifListOfMissionsNull = Arrays.asList(obj).toArray(new Integer[0]);
+                    }
+                    return new MissionBundle(
+                            rs.getInt("bundleid"),
+                            ifListOfBelongsToGroupsNull,
+                            ifListOfMissionsNull,
+                            rs.getString("bundlename"));
+                });
+        return result;
+    }
+
     @GetMapping("/{id}/listofmissions")
     public Integer[] getListOfMissions(@PathVariable Integer id) {
         RowMapper<Integer[]> listOfMissionsRowMapper = new OneIntegerRowMapper("listofmissions");

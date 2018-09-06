@@ -298,6 +298,44 @@ public class GroupController {
             throw new NotAuthorizedException("Not authorized");
         }
     }
+
+    @GetMapping("/teachersgroups/{name}")
+    public List<Group> groupsByTeacherName(@PathVariable String name,Principal principal){
+        RowMapper<User> userRowMapper = new UserRowMapper();
+        String subQuery = "SELECT * FROM users where authid=?";
+        User authenticatedPrincipal = jdbc.queryForObject(subQuery, userRowMapper, principal.getName());
+        if (authenticatedPrincipal.getRole().equals("Teacher")) {
+            List<Group> result = jdbc.query("select * from groups where '" + name + "'=ANY(teachers)",
+                    (ResultSet rs, int index) -> {
+                        String[] ifTeachersNull;
+                        if (rs.getArray("teachers") == null) {
+                            ifTeachersNull = new String[0];
+                        } else {
+//                    ifTeachersNull = (String[])rs.getArray("teachers").getArray();
+                            Object[] o = (Object[]) rs.getArray("teachers").getArray();
+                            ifTeachersNull = Arrays.asList(o).toArray(new String[0]);
+                        }
+                        String[] ifPupilsNull;
+                        if (rs.getArray("pupils") == null) {
+                            ifPupilsNull = new String[0];
+                        } else {
+//                    ifPupilsNull =(String[])rs.getArray("pupils").getArray();
+                            Object[] o = (Object[]) rs.getArray("pupils").getArray();
+                            ifPupilsNull = Arrays.asList(o).toArray(new String[0]);
+                        }
+                        return new Group(
+                                rs.getInt("groupid"),
+                                rs.getString("groupname"),
+                                ifTeachersNull,
+                                ifPupilsNull,
+                                rs.getInt("missionscores"));
+                    });
+            return result;
+        } else {
+            throw new NotAuthorizedException("Not authorized");
+        }
+    }
+
     //TODO: tämä jää toistaiseksi tänne
 //    @PutMapping("/{groupid}/scores")
 //    public int updateGroupTaskscores(@PathVariable Integer groupid, @RequestBody Group group) {
